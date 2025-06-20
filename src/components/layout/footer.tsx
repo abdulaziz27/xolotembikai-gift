@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Heart, Facebook, Instagram, Twitter } from 'lucide-react'
+import { Facebook, Instagram, Twitter } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -92,11 +92,11 @@ export default function Footer() {
             <p className="text-gray-400 text-sm text-center">© 2024 Givva. All rights reserved.</p>
             
             {/* Legal Links */}
-            <div className="flex space-x-6 text-sm text-gray-400">
-              <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
-              <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-              <Link href="#" className="hover:text-white transition-colors">Accessibility</Link>
-            </div>
+             <div className="flex space-x-6 text-sm text-gray-400">
+               <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+               <Link href="/terms" className="hover:text-white transition-colors">Privacy Policy</Link>
+               <Link href="#" className="hover:text-white transition-colors">Accessibility</Link>
+             </div>
           </div>
         </div>
       </div>

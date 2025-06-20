@@ -1,6 +1,6 @@
 'use client'
 
-import { Star, Heart, Eye, Lightbulb, Gift, Users, Crown, Monitor } from 'lucide-react'
+import { Star, Heart, Lightbulb, Gift, Users, Crown, Monitor } from 'lucide-react'
 import { ChevronDown } from 'lucide-react'
 
 export default function AboutPage() {

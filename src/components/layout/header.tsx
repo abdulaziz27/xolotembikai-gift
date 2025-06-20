@@ -28,10 +28,10 @@ export default function Header() {
             <Link href="/about" className="text-white hover:text-purple-400 transition-colors">
               About Us
             </Link>
-            <Link href="#" className="text-white hover:text-purple-400 transition-colors">
+            <Link href="/partner" className="text-white hover:text-purple-400 transition-colors">
               Become A Partner
             </Link>
-            <Link href="#" className="text-white hover:text-purple-400 transition-colors">
+            <Link href="/blog" className="text-white hover:text-purple-400 transition-colors">
               Blog
             </Link>
             <Link href="/faq" className="text-white hover:text-purple-400 transition-colors">
@@ -60,10 +60,10 @@ export default function Header() {
               <Link href="/about" className="block px-3 py-2 text-white hover:text-purple-400 transition-colors">
                 About Us
               </Link>
-              <Link href="#" className="block px-3 py-2 text-white hover:text-purple-400 transition-colors">
+              <Link href="/partner" className="block px-3 py-2 text-white hover:text-purple-400 transition-colors">
                 Become A Partner
               </Link>
-              <Link href="#" className="block px-3 py-2 text-white hover:text-purple-400 transition-colors">
+              <Link href="/blog" className="block px-3 py-2 text-white hover:text-purple-400 transition-colors">
                 Blog
               </Link>
               <Link href="/faq" className="block px-3 py-2 text-white hover:text-purple-400 transition-colors">
