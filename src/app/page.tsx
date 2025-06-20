@@ -149,7 +149,7 @@ export default function Home() {
 
             <div className="relative">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                <Image
+        <Image
                   src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop"
                   alt="Person enjoying experience"
                   width={600}
@@ -374,7 +374,7 @@ export default function Home() {
             {experiences.map((experience) => (
               <div key={experience.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group">
                 <div className="relative">
-                  <Image
+          <Image
                     src={experience.image}
                     alt={experience.title}
                     width={400}
@@ -486,22 +486,22 @@ export default function Home() {
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-20 bg-gradient-to-r from-purple-900 via-purple-800 to-orange-600">
+      <section className="py-20 bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">
-            Never Miss a <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-orange-300">Gift Moment</span>
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+            Never Miss a <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-orange-400">Gift Moment</span>
           </h2>
-          <p className="text-xl text-purple-100 mb-8">
+          <p className="text-lg text-gray-300 mb-8">
             Get exclusive offers, new experience alerts, and gifting inspiration delivered to your inbox.
           </p>
           
-          <div className="flex flex-col sm:flex-row max-w-md mx-auto space-y-3 sm:space-y-0 sm:space-x-3">
+          <div className="flex flex-col sm:flex-row max-w-lg mx-auto space-y-3 sm:space-y-0 sm:space-x-3">
             <input
               type="email"
               placeholder="Enter your email address"
-              className="flex-1 px-6 py-4 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
+              className="flex-1 px-6 py-4 rounded-full bg-gray-800 text-white placeholder-gray-400 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
-            <button className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg transition-all duration-300">
+            <button className="bg-gradient-to-r from-purple-600 to-orange-500 text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg transition-all duration-300 whitespace-nowrap">
               Subscribe
             </button>
           </div>
