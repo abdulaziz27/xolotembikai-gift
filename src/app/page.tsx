@@ -311,7 +311,7 @@ export default function Home() {
                 { name: 'Birthday', emoji: '🎂', count: 120, description: 'Celebrate another year with unforgettable experiences' },
                 { name: 'Anniversary', emoji: '💖', count: 85, description: 'Romantic experiences for special milestones' },
                 { name: 'Graduation', emoji: '🎓', count: 65, description: 'Celebrate achievements with memorable rewards' },
-                { name: "Mother&apos;s Day", emoji: '🌸', count: 120, description: 'Show appreciation with relaxing experiences' }
+                { name: "Mother's Day", emoji: '🌸', count: 120, description: 'Show appreciation with relaxing experiences' }
               ].map((occasion) => (
                 <div key={occasion.name} className="bg-white rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 cursor-pointer group relative">
                   <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full">
