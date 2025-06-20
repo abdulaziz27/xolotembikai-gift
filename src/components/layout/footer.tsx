@@ -45,8 +45,8 @@ export default function Footer() {
               <li><Link href="#" className="hover:text-white transition-colors">Birthdays</Link></li>
               <li><Link href="#" className="hover:text-white transition-colors">Anniversaries</Link></li>
               <li><Link href="#" className="hover:text-white transition-colors">Graduations</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Mother's Day</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">Father's Day</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Mother&apos;s Day</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Father&apos;s Day</Link></li>
             </ul>
           </div>
 
