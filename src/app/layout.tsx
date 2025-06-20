@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Xolotembikai Gift - Experience Gifts Platform",
-  description: "Experience gifts that create lasting memories",
+  title: "Givva - Experience Gifts Platform",
+  description: "Don't give boring gifts. Give unforgettable experiences that create lasting memories.",
 };
 
 export default function RootLayout({
@@ -27,12 +27,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
         <Header />
-        <main className="flex-grow">
-          {children}
-        </main>
+        {children}
         <Footer />
       </body>
     </html>
