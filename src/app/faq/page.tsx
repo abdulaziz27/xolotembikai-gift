@@ -81,7 +81,7 @@ export default function FAQPage() {
   let questionIndex = 0
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50 pt-16">
       {/* Hero Section */}
       <section className="pt-20 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

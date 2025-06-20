@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 export default function BlogDetailPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-16">
       {/* Breadcrumb */}
       <div className="bg-gray-50 py-4">
         <div className="container mx-auto px-4 max-w-4xl">

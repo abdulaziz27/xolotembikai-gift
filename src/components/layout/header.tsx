@@ -25,6 +25,9 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
+            <Link href="/experiences" className="text-white hover:text-purple-400 transition-colors">
+              Experiences
+            </Link>
             <Link href="/about" className="text-white hover:text-purple-400 transition-colors">
               About Us
             </Link>
@@ -57,6 +60,9 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden bg-black/95 backdrop-blur-md border-t border-gray-800">
             <div className="px-2 pt-2 pb-3 space-y-1">
+              <Link href="/experiences" className="block px-3 py-2 text-white hover:text-purple-400 transition-colors">
+                Experiences
+              </Link>
               <Link href="/about" className="block px-3 py-2 text-white hover:text-purple-400 transition-colors">
                 About Us
               </Link>
