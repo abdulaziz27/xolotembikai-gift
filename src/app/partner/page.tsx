@@ -115,7 +115,7 @@ export default function PartnerPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="pt-20 pb-16 bg-gradient-to-br from-purple-50 via-white to-orange-50 min-h-screen flex items-center">
+      <section className="pt-24 sm:pt-20 pb-16 bg-gradient-to-br from-purple-50 via-white to-orange-50 min-h-screen flex items-center">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Badge */}
           <div className="inline-flex items-center bg-yellow-100 text-yellow-800 px-6 py-3 rounded-full mb-8 text-sm font-semibold">

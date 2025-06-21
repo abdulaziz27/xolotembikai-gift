@@ -9,7 +9,7 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50">
       {/* Hero Section */}
-      <section className="pt-20 pb-16">
+      <section className="pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
             Terms &{' '}
