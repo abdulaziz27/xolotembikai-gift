@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Star, MapPin, Phone, Heart, Share, Calendar, ChevronDown, ChevronUp, Check, Gift, CreditCard } from 'lucide-react'
+import { Star, MapPin, Phone, Heart, Share, Calendar, ChevronDown, ChevronUp, Check, Gift } from 'lucide-react'
 import Image from 'next/image'
 
 interface ExperienceDetailProps {
