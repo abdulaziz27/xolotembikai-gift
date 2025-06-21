@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Givva - Experience Gifts Platform",
-  description: "Don't give boring gifts. Give unforgettable experiences that create lasting memories.",
+  description: "Don&apos;t give boring gifts. Give unforgettable experiences that create lasting memories.",
 };
 
 export default function RootLayout({

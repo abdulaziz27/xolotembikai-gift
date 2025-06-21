@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import { Star, MapPin, Phone, Heart, Share, Calendar, ChevronDown, ChevronUp, Check, Gift } from 'lucide-react'
+import Image from 'next/image'
 
 interface ExperienceDetailProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
-export default function ExperienceDetailPage({ params }: ExperienceDetailProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProps) {
   const [activeTab, setActiveTab] = useState('whats-included')
   const [giftOption, setGiftOption] = useState('gift-someone')
   const [isGiftDetailsOpen, setIsGiftDetailsOpen] = useState(true)
@@ -37,7 +39,7 @@ export default function ExperienceDetailPage({ params }: ExperienceDetailProps) 
       { icon: Check, text: "100% Satisfaction", color: "text-pink-500" },
       { icon: Calendar, text: "Valid 6-12 Months", color: "text-red-500" }
     ],
-    description: "Indulge in a full day of relaxation and rejuvenation at Grand Serenity Hotel's award-winning spa. This premium experience includes access to all spa facilities, a 90-minute signature massage, facial treatment, and a healthy gourmet lunch.",
+    description: "Indulge in a full day of relaxation and rejuvenation at Grand Serenity Hotel&apos;s award-winning spa. This premium experience includes access to all spa facilities, a 90-minute signature massage, facial treatment, and a healthy gourmet lunch.",
     includes: [
       "90-minute signature massage",
       "Access to sauna, steam room & jacuzzi", 
@@ -155,18 +157,22 @@ export default function ExperienceDetailPage({ params }: ExperienceDetailProps) 
             {/* Images Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
               <div className="col-span-2 lg:col-span-2">
-                <img 
+                <Image 
                   src={experience.images[0]} 
                   alt="Main experience image"
+                  width={600}
+                  height={320}
                   className="w-full h-64 lg:h-80 object-cover rounded-2xl"
                 />
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
                 {experience.images.slice(1).map((image, index) => (
-                  <img 
+                  <Image 
                     key={index}
                     src={image} 
                     alt={`Experience image ${index + 2}`}
+                    width={300}
+                    height={200}
                     className="w-full h-28 lg:h-[75px] object-cover rounded-xl"
                   />
                 ))}
@@ -177,7 +183,7 @@ export default function ExperienceDetailPage({ params }: ExperienceDetailProps) 
             <div className="mb-8">
               <div className="flex flex-wrap border-b border-gray-200">
                 {[
-                  { id: 'whats-included', label: "What's Included" },
+                  { id: 'whats-included', label: "What&apos;s Included" },
                   { id: 'redemption', label: 'Redemption' },
                   { id: 'faq', label: 'FAQ' },
                   { id: 'fine-print', label: 'Fine Print' }
@@ -310,7 +316,7 @@ export default function ExperienceDetailPage({ params }: ExperienceDetailProps) 
                 {similarExperiences.map((similar) => (
                   <div key={similar.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = `/experiences/spa-experience-${similar.id}`}>
                     <div className="relative">
-                      <img src={similar.image} alt={similar.title} className="w-full h-40 object-cover" />
+                      <Image src={similar.image} alt={similar.title} width={300} height={160} className="w-full h-40 object-cover" />
                       <div className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
                         Save ${similar.savings}
                       </div>

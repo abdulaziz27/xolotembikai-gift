@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ArrowLeft, Zap, Shield, CreditCard, Check } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -97,7 +98,7 @@ export default function CheckoutPage() {
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
-                  <p className="text-sm text-gray-500 mt-1">We'll send your confirmation here</p>
+                  <p className="text-sm text-gray-500 mt-1">We&apos;ll send your confirmation here</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -231,9 +232,11 @@ export default function CheckoutPage() {
               
               {/* Experience Item */}
               <div className="flex items-start space-x-4 mb-6">
-                <img 
+                <Image 
                   src="https://via.placeholder.com/80x80/A855F7/FFFFFF?text=Spa"
                   alt="Luxury Spa Day Experience"
+                  width={80}
+                  height={80}
                   className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl"
                 />
                 <div className="flex-1">

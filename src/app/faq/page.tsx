@@ -26,7 +26,7 @@ export default function FAQPage() {
         },
         {
           question: "How do I reset my password?",
-          answer: "Click 'Forgot Password' on the login page, enter your email address, and we'll send you a reset link. Check your email (including spam folder) and follow the instructions to create a new password."
+          answer: "Click &apos;Forgot Password&apos; on the login page, enter your email address, and we&apos;ll send you a reset link. Check your email (including spam folder) and follow the instructions to create a new password."
         }
       ]
     },
@@ -45,7 +45,7 @@ export default function FAQPage() {
         },
         {
           question: "What happens if I need to cancel last minute?",
-          answer: "Last-minute cancellations (within 24 hours) may be subject to cancellation fees depending on the experience provider's policy. We recommend rescheduling when possible. Emergency cancellations due to illness or unforeseen circumstances are handled case-by-case."
+          answer: "Last-minute cancellations (within 24 hours) may be subject to cancellation fees depending on the experience provider&apos;s policy. We recommend rescheduling when possible. Emergency cancellations due to illness or unforeseen circumstances are handled case-by-case."
         },
         {
           question: "Can I reschedule instead of canceling?",
@@ -60,7 +60,7 @@ export default function FAQPage() {
       questions: [
         {
           question: "How do I book an experience?",
-          answer: "Browse our experiences, select the one you want, choose your preferred date and time, add any customizations, and proceed to checkout. You can book for yourself or as a gift for someone else. Payment is processed securely, and you'll receive confirmation immediately."
+          answer: "Browse our experiences, select the one you want, choose your preferred date and time, add any customizations, and proceed to checkout. You can book for yourself or as a gift for someone else. Payment is processed securely, and you&apos;ll receive confirmation immediately."
         },
         {
           question: "What types of experiences do you offer?",
@@ -68,11 +68,11 @@ export default function FAQPage() {
         },
         {
           question: "Can I customize an experience?",
-          answer: "Many experiences offer customization options such as dietary preferences, skill levels, group sizes, or special requests. Look for the 'Customize' option when booking, or contact the experience provider directly through our platform to discuss specific needs."
+          answer: "Many experiences offer customization options such as dietary preferences, skill levels, group sizes, or special requests. Look for the &apos;Customize&apos; option when booking, or contact the experience provider directly through our platform to discuss specific needs."
         },
         {
           question: "What if the weather affects my outdoor experience?",
-          answer: "For weather-dependent outdoor experiences, providers typically offer flexible rescheduling or alternative indoor activities. Check the experience details for weather policies. If severe weather forces cancellation, you'll receive a full refund or credit for future use."
+          answer: "For weather-dependent outdoor experiences, providers typically offer flexible rescheduling or alternative indoor activities. Check the experience details for weather policies. If severe weather forces cancellation, you&apos;ll receive a full refund or credit for future use."
         }
       ]
     }

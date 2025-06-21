@@ -33,7 +33,7 @@ export default function BlogPage() {
     },
     {
       id: "start-blog-10-steps",
-      title: "How to start a blog in 10 steps: a beginner's guide",
+      title: "How to start a blog in 10 steps: a beginner&apos;s guide",
       image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop",
       category: "Website Essentials",
       readTime: "10 min read"

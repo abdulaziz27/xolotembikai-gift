@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { Check, Eye, Gift, Home, HelpCircle, Mail, CalendarDays } from 'lucide-react'
+import { Check, Eye, Gift, Home, HelpCircle, CalendarDays } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 export default function PaymentSuccessPage() {
   const router = useRouter()
@@ -40,9 +40,11 @@ export default function PaymentSuccessPage() {
             </div>
             
             <div className="flex items-start space-x-4">
-              <img 
+              <Image 
                 src="https://via.placeholder.com/80x80/A855F7/FFFFFF?text=Spa"
                 alt="Luxury Spa Day Experience"
+                width={80}
+                height={80}
                 className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl flex-shrink-0"
               />
               <div className="flex-1">
