@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Star, MapPin, Phone, Heart, Share, Calendar, ChevronDown, ChevronUp, Check, Gift } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Star, MapPin, Phone, Heart, Share, Calendar, ChevronDown, ChevronUp, Check, Gift, CreditCard } from 'lucide-react'
 import Image from 'next/image'
 
 interface ExperienceDetailProps {
@@ -10,7 +11,13 @@ interface ExperienceDetailProps {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProps) {
-  const [activeTab, setActiveTab] = useState('whats-included')
+  // Get experience type from URL params
+  const searchParams = useSearchParams()
+  const experienceType = searchParams.get('type') || 'booking' // default to booking if no type specified
+  
+  // Set default tab based on experience type
+  const defaultTab = experienceType === 'gift-card' ? 'how-it-works' : 'whats-included'
+  const [activeTab, setActiveTab] = useState(defaultTab)
   const [giftOption, setGiftOption] = useState('gift-someone')
   const [isGiftDetailsOpen, setIsGiftDetailsOpen] = useState(true)
   const [selectedCurrency, setSelectedCurrency] = useState('USD')
@@ -18,6 +25,7 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
   const [showDeliveryOptions, setShowDeliveryOptions] = useState(false)
   const [showCalendar, setShowCalendar] = useState(false)
   const [showCurrencySelector, setShowCurrencySelector] = useState(false)
+  const [selectedGiftAmount, setSelectedGiftAmount] = useState(100)
 
   // Mock data - in real app this would come from API based on params.slug
   const experience = {
@@ -65,7 +73,10 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
     { code: 'GBP', symbol: '£', price: 235 }
   ]
 
+  const giftCardAmounts = [100, 200, 300, 750]
+
   const currentCurrency = currencies.find(c => c.code === selectedCurrency) || currencies[0]
+  const currentPrice = experienceType === 'gift-card' ? selectedGiftAmount : currentCurrency.price
 
   const similarExperiences = [
     {
@@ -75,7 +86,7 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
       originalPrice: 550,
       discountedPrice: 450,
       savings: 100,
-      image: 'fashion-card'
+      image: "https://via.placeholder.com/300x200/F97316/FFFFFF?text=Couples+Massage"
     },
     {
       id: 2,
@@ -84,7 +95,7 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
       originalPrice: 750,
       discountedPrice: 650,
       savings: 100,
-      image: 'fashion-card'
+      image: "https://via.placeholder.com/300x200/EC4899/FFFFFF?text=Wellness+Weekend"
     },
     {
       id: 3,
@@ -93,7 +104,7 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
       originalPrice: 220,
       discountedPrice: 180,
       savings: 40,
-      image: 'fashion-card'
+      image: "https://via.placeholder.com/300x200/EF4444/FFFFFF?text=Hot+Stone"
     },
     {
       id: 4,
@@ -137,10 +148,12 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
+
+
             {/* Header */}
             <div className="mb-6">
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                {experience.title}
+                {experienceType === 'gift-card' ? `${experience.provider} Gift Card` : experience.title}
               </h1>
               
               {/* Badges */}
@@ -152,6 +165,15 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
                   </div>
                 ))}
               </div>
+
+              {/* Gift Card Description */}
+              {experienceType === 'gift-card' && (
+                <div className="mb-6">
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    The perfect gift for any occasion. Give the gift of relaxation and wellness. Our gift cards can be used for any service or experience at {experience.provider}, from luxurious massages and facials to full spa day packages.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Images Grid */}
@@ -182,12 +204,17 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
             {/* Tab Navigation */}
             <div className="mb-8">
               <div className="flex flex-wrap border-b border-gray-200">
-                {[
+                {(experienceType === 'booking' ? [
                   { id: 'whats-included', label: "What&apos;s Included" },
                   { id: 'redemption', label: 'Redemption' },
                   { id: 'faq', label: 'FAQ' },
                   { id: 'fine-print', label: 'Fine Print' }
-                ].map((tab) => (
+                ] : [
+                  { id: 'how-it-works', label: 'How It Works' },
+                  { id: 'gift-benefits', label: 'Gift Card Benefits' },
+                  { id: 'faq', label: 'FAQ' },
+                  { id: 'fine-print', label: 'Fine Print' }
+                ]).map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
@@ -205,7 +232,8 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
 
             {/* Tab Content */}
             <div className="mb-8">
-              {activeTab === 'whats-included' && (
+              {/* Experience Booking Tabs */}
+              {experienceType === 'booking' && activeTab === 'whats-included' && (
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 mb-4">Overview</h2>
                   <p className="text-gray-700 mb-8 leading-relaxed">
@@ -220,6 +248,92 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
                         <span className="text-gray-700">{item}</span>
                       </div>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Gift Card Tabs */}
+              {experienceType === 'gift-card' && activeTab === 'how-it-works' && (
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 mb-6">How It Works</h2>
+                  <div className="space-y-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                        1
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 mb-2">Choose Your Amount</h3>
+                        <p className="text-gray-600">Select from preset amounts or enter a custom value between $100-$1,000.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-4">
+                      <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                        2
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 mb-2">Personalize Your Gift</h3>
+                        <p className="text-gray-600">Add a personal message and choose how to deliver the gift card.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-4">
+                      <div className="w-8 h-8 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                        3
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 mb-2">Instant Delivery</h3>
+                        <p className="text-gray-600">Digital gift card delivered instantly via email, WhatsApp, or text.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {experienceType === 'gift-card' && activeTab === 'gift-benefits' && (
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 mb-6">Gift Card Benefits</h2>
+                  <div className="grid sm:grid-cols-2 gap-8">
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-4">What&apos;s Included:</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-start space-x-3">
+                          <Check className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-700">Valid for all spa services</span>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                          <Check className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-700">No expiry date</span>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                          <Check className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-700">Transferable to friends & family</span>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                          <Check className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-700">Can be used multiple times</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-4">Perfect For:</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-start space-x-3">
+                          <Gift className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-700">Birthdays & anniversaries</span>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                          <Gift className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-700">Corporate gifts</span>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                          <Gift className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-700">Holiday presents</span>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                          <Gift className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-gray-700">Self-care treats</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -309,9 +423,60 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
               </div>
             </div>
 
+            {/* Redeemable Locations - Gift Card Only */}
+            {experienceType === 'gift-card' && (
+              <div className="mb-8">
+                <div className="flex items-center space-x-2 mb-4">
+                  <MapPin className="w-5 h-5 text-purple-500" />
+                  <h2 className="text-xl font-bold text-gray-900">Redeemable Locations</h2>
+                </div>
+                <p className="text-gray-600 mb-4">Use your gift card at any of our spa locations.</p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+                    <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                      1
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900">Spa XYZ - Downtown Plaza</h3>
+                      <p className="text-gray-600 text-sm">123 Wellness Boulevard, Downtown</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+                    <div className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                      2
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900">Spa XYZ - Marina Bay</h3>
+                      <p className="text-gray-600 text-sm">456 Waterfront Drive, Marina</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+                    <div className="w-6 h-6 bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                      3
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900">Spa XYZ - Orchard Central</h3>
+                      <p className="text-gray-600 text-sm">789 Shopping Street, Orchard</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+                    <div className="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                      4
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900">Spa XYZ - Sentosa Resort</h3>
+                      <p className="text-gray-600 text-sm">321 Beach Resort, Sentosa Island</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Similar Experiences */}
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Similar Gift Experiences You Might Like</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                {experienceType === 'gift-card' ? 'Other Gift Cards You Might Like' : 'Similar Gift Experiences You Might Like'}
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {similarExperiences.map((similar) => (
                   <div key={similar.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = `/experiences/spa-experience-${similar.id}`}>
@@ -348,13 +513,15 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <span className="text-3xl font-bold">
-                        {currentCurrency.symbol}{currentCurrency.price.toLocaleString()}
+                        {currentCurrency.symbol}{currentPrice.toLocaleString()}
                       </span>
-                      <span className="text-lg text-purple-100 line-through">
-                        {currentCurrency.code === 'USD' ? '$399' : 
-                         currentCurrency.code === 'MYR' ? 'RM1,796' : 
-                         currentCurrency.code === 'SGD' ? 'S$540' : '£314'}
-                      </span>
+                      {experienceType === 'booking' && (
+                        <span className="text-lg text-purple-100 line-through">
+                          {currentCurrency.code === 'USD' ? '$399' : 
+                           currentCurrency.code === 'MYR' ? 'RM1,796' : 
+                           currentCurrency.code === 'SGD' ? 'S$540' : '£314'}
+                        </span>
+                      )}
                     </div>
                     <div className="relative">
                       <button
@@ -382,12 +549,54 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
                       )}
                     </div>
                   </div>
-                  <div className="bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-bold inline-block">
-                    Save 25%
-                  </div>
+                  {experienceType === 'booking' && (
+                    <div className="bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-bold inline-block">
+                      Save 25%
+                    </div>
+                  )}
+                  {experienceType === 'gift-card' && (
+                    <div className="bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-bold inline-block">
+                      Gift Card Value
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-6">
+                  {/* Gift Card Amount Selection */}
+                  {experienceType === 'gift-card' && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Choose Gift Card Amount:</h3>
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        {giftCardAmounts.map((amount) => (
+                          <button
+                            key={amount}
+                            onClick={() => setSelectedGiftAmount(amount)}
+                            className={`py-3 px-4 text-sm font-semibold rounded-lg transition-colors ${
+                              selectedGiftAmount === amount
+                                ? 'bg-gradient-to-r from-purple-600 to-orange-500 text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            ${amount}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Custom Amount
+                        </label>
+                        <input
+                          type="number"
+                          min="100"
+                          max="1000"
+                          placeholder="Enter custom amount"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          onChange={(e) => setSelectedGiftAmount(parseInt(e.target.value) || 100)}
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   {/* Option Selection */}
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Choose your option:</h3>
@@ -400,7 +609,7 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
                             : 'bg-white border border-gray-300 text-gray-700'
                         }`}
                       >
-                        For Myself
+                        {experienceType === 'gift-card' ? 'Gift Myself' : 'For Myself'}
                       </button>
                       <button
                         onClick={() => setGiftOption('gift-someone')}
@@ -560,9 +769,14 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
                   <div className="mb-6">
                     <div className="flex items-center justify-between text-lg font-bold mb-2">
                       <span>Total:</span>
-                      <span className="text-2xl">{currentCurrency.symbol}{currentCurrency.price.toLocaleString()}</span>
+                      <span className="text-2xl">{currentCurrency.symbol}{currentPrice.toLocaleString()}</span>
                     </div>
-                    <p className="text-sm text-gray-500">Digital gift card will be sent to recipient</p>
+                    <p className="text-sm text-gray-500">
+                      {experienceType === 'gift-card' 
+                        ? 'Digital gift card will be sent to recipient'
+                        : 'Booking confirmation will be sent via email'
+                      }
+                    </p>
                   </div>
 
                   {/* Action Buttons */}
@@ -571,7 +785,12 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
                       onClick={() => window.location.href = '/checkout'}
                       className="w-full bg-gradient-to-r from-purple-600 to-orange-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2">
                       <Gift className="w-5 h-5" />
-                      <span>{giftOption === 'gift-someone' ? 'Send as Gift' : 'Book Now'}</span>
+                      <span>
+                        {experienceType === 'gift-card' 
+                          ? (giftOption === 'gift-someone' ? 'Buy Gift Card' : 'Buy Gift Card')
+                          : (giftOption === 'gift-someone' ? 'Send as Gift' : 'Book Now')
+                        }
+                      </span>
                     </button>
                     
                     <div className="flex space-x-2">

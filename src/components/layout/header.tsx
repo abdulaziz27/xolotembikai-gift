@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Heart, Menu, X } from 'lucide-react'
+import { Heart, Menu, X, User } from 'lucide-react'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -43,6 +43,12 @@ export default function Header() {
             <Link href="/contact" className="text-white hover:text-purple-400 transition-colors">
               Contact
             </Link>
+            
+            {/* Auth Button */}
+            <Link href="/login" className="bg-gradient-to-r from-purple-600 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center space-x-1">
+              <User className="w-4 h-4" />
+              <span>Login</span>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -78,6 +84,13 @@ export default function Header() {
               <Link href="/contact" className="block px-3 py-2 text-white hover:text-purple-400 transition-colors">
                 Contact
               </Link>
+              
+              {/* Mobile Auth Button */}
+              <div className="px-3 py-2">
+                <Link href="/login" className="block px-3 py-2 bg-gradient-to-r from-purple-600 to-orange-500 text-white rounded-lg text-center font-semibold">
+                  Login
+                </Link>
+              </div>
             </div>
           </div>
         )}
