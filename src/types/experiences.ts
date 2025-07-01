@@ -2,57 +2,40 @@ import type { Vendor } from './vendors'
 
 export interface Experience {
   id: string;
-  slug: string;
   title: string;
+  slug: string;
   short_description: string;
-  long_description: string; // Changed from full_description to match DB
+  long_description: string;
   category: string;
+  vendor_id: string;
   occasions: string[];
   starting_price: number;
-  price_options: number[];
-  currency: string;
-  is_variable_pricing: boolean;
-  vendor_id?: string;
-  vendor?: Vendor;
-  location?: string;
-  address?: string;
-  coordinates?: {
-    lat: number;
-    lng: number;
-  };
-  gallery: string[] | any; // Changed to handle JSONB type
-  featured_image?: string;
-  video_url?: string;
-  duration?: string;
-  duration_hours?: number; // Added to match sample data
+  duration_hours?: number;
   max_participants?: number;
-  min_participants?: number; // Added to match sample data
-  min_age?: number;
-  difficulty_level?: 'Easy' | 'Moderate' | 'Challenging';
-  redemption_instructions?: string;
-  requirements: string[]; // Changed from booking_requirements
-  inclusions: string[]; // Changed from included_items
-  exclusions: string[]; // Changed from excluded_items
+  min_participants?: number;
+  location?: string;
+  featured_image?: string;
+  gallery?: string[];
+  tags?: string[];
+  inclusions?: string[];
+  exclusions?: string[];
+  requirements?: string[];
   cancellation_policy?: string;
-  vendor_type: 'api' | 'manual';
-  api_endpoint?: string;
-  manual_codes: string[];
-  seo_title?: string;
-  seo_description?: string;
-  tags: string[];
-  status: 'draft' | 'active' | 'archived';
-  published_at?: string;
-  expires_at?: string;
+  status: 'active' | 'draft' | 'archived';
   is_featured: boolean;
-  is_gift_wrappable: boolean;
-  allows_custom_message: boolean;
-  allows_scheduling: boolean;
   rating: number;
-  total_reviews: number; // Added to match sample data
+  total_reviews: number;
   total_bookings: number;
-  total_revenue: number;
-  created_at: string;
-  updated_at: string;
+  currency: string;
+  price_options?: Record<string, number | string>;
+  vendor?: {
+    id: string;
+    name: string;
+    logo?: string;
+    description?: string;
+  };
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ExperienceReview {

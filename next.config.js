@@ -17,6 +17,11 @@ const nextConfig = {
         hostname: 'via.placeholder.com',
       },
     ],
+    domains: [
+      'xolotembikai.sgp1.cdn.digitaloceanspaces.com',
+      'xolotembikai.sgp1.digitaloceanspaces.com',
+      'images.unsplash.com'
+    ],
   },
 
   output: 'standalone',

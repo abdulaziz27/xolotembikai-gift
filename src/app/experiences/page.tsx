@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronDown, Star, Gift, ShoppingBag, Filter, X } from 'lucide-react'
 import { Experience, FilterOptions } from '@/types/experiences'
 import { experienceService, experienceUtils } from '@/lib/services/experiences'
+import Image from 'next/image'
 
 interface FilterState {
   priceRange: string[]
@@ -36,7 +37,7 @@ export default function ExperiencesPage() {
   const router = useRouter()
 
   // Fetch experiences and filter options
-  const fetchExperiences = async (loadMore = false) => {
+  const fetchExperiences = useCallback(async (loadMore = false) => {
     try {
       if (!loadMore) {
         setLoading(true)
@@ -95,7 +96,7 @@ export default function ExperiencesPage() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }
+  }, [selectedFilters, sortBy, currentPage])
 
   const fetchFilterOptions = async () => {
     try {
@@ -112,7 +113,7 @@ export default function ExperiencesPage() {
 
   useEffect(() => {
     fetchExperiences()
-  }, [selectedFilters, sortBy])
+  }, [selectedFilters, sortBy, fetchExperiences])
 
   const handleFilterChange = (category: keyof FilterState, value: string) => {
     setSelectedFilters(prev => {
@@ -487,9 +488,11 @@ export default function ExperiencesPage() {
                         
                         {/* Image or placeholder */}
                         {experience.featured_image ? (
-                          <img 
+                          <Image 
                             src={experience.featured_image} 
                             alt={experience.title}
+                            width={400}
+                            height={300}
                             className="w-full h-full object-cover"
                           />
                         ) : (
