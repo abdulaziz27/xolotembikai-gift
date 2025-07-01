@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, Lock } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-export default function SetupPasswordPage() {
+function SetupPasswordContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [password, setPassword] = useState('')
@@ -183,5 +183,22 @@ export default function SetupPasswordPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function SetupPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full space-y-8 p-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900">Loading...</h2>
+            <p className="mt-2 text-gray-600">Please wait while we verify your setup link.</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <SetupPasswordContent />
+    </Suspense>
   )
 } 

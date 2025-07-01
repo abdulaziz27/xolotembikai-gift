@@ -6,20 +6,7 @@ import { Eye, Edit3, Package, CreditCard, User, Calendar } from "lucide-react"
 
 import { DataTable } from "@/components/ui/data-table"
 import { ActionButton, StatusBadge } from "@/components/ui/data-table"
-
-interface Order {
-  id: string
-  order_number: string
-  customer_name: string
-  customer_email: string
-  experience_title: string
-  total_amount: number
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'refunded'
-  payment_status: 'pending' | 'paid' | 'failed' | 'refunded'
-  order_date: string
-  experience_date?: string
-  participants: number
-}
+import type { Order } from "@/types/orders"
 
 interface OrdersTableProps {
   data: Order[]

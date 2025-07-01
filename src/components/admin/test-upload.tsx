@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import type { Bucket } from '@supabase/storage-js'
 
 export default function TestUpload() {
   const [isUploading, setIsUploading] = useState(false)
@@ -27,7 +28,7 @@ export default function TestUpload() {
       const { data: buckets, error: bucketError } = await supabase.storage.listBuckets()
       if (bucketError) throw bucketError
       
-      const experienceBucket = buckets.find(b => b.id === 'experience-images')
+      const experienceBucket = buckets.find((b: Bucket) => b.id === 'experience-images')
       if (!experienceBucket) {
         throw new Error('Bucket experience-images not found')
       }

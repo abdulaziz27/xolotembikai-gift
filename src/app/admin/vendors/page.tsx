@@ -1,26 +1,26 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Plus } from "lucide-react"
-import { VendorsTable } from "./components/vendors-table"
+import VendorsTable from "./components/vendors-table"
 import { vendorService } from "@/lib/services/vendors"
 import { useToast } from "@/components/ui/toast"
 import type { Vendor } from "@/types"
 
-export default function AdminVendorsPage() {
-  const { showToast } = useToast()
+export default function VendorsPage() {
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [loading, setLoading] = useState(true)
+  const { addToast } = useToast()
 
   const fetchVendors = async () => {
     try {
-      setLoading(true)
-      const vendorsData = await vendorService.getAllVendors()
-      setVendors(vendorsData)
+      const data = await vendorService.getAllVendors()
+      setVendors(data)
     } catch (error) {
-      console.error('Failed to fetch vendors:', error)
-      showToast('Failed to load vendors', 'error')
+      console.error("Failed to fetch vendors:", error)
+      addToast({ type: "error", title: "Failed to fetch vendors" })
     } finally {
       setLoading(false)
     }
@@ -36,7 +36,7 @@ export default function AdminVendorsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Vendors</h1>
           <p className="text-gray-600 mt-1">
-            Manage experience providers and their information
+            Manage your experience providers
           </p>
         </div>
         <Link
@@ -48,7 +48,7 @@ export default function AdminVendorsPage() {
         </Link>
       </div>
 
-      <VendorsTable 
+      <VendorsTable
         data={vendors}
         loading={loading}
         onRefresh={fetchVendors}

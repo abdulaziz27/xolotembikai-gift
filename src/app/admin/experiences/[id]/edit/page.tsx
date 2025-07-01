@@ -1,13 +1,30 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
-import { ArrowLeft, Save, Eye } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ArrowLeft, Save, Eye } from 'lucide-react'
 import { experienceService } from '@/lib/services/experiences'
-import { Experience, ExperienceForm, Vendor, Category, Occasion, CURRENCIES } from '@/types/experiences'
+import { Experience, ExperienceForm, Category, Occasion, CURRENCIES } from '@/types/experiences'
+import { Vendor } from '@/types/vendors'
 import FileUploader from '@/components/admin/file-uploader'
 import { useToast } from '@/components/ui/toast'
+import RichTextEditor from '@/components/admin/rich-text-editor'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Select } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { AlertCircle } from 'lucide-react'
 
 export default function EditExperiencePage() {
   const router = useRouter()
@@ -26,7 +43,7 @@ export default function EditExperiencePage() {
     category: '',
     occasions: [],
     starting_price: 0,
-    price_options: [],
+    price_options: {},
     currency: 'MYR',
     is_variable_pricing: false,
     vendor_id: undefined,
@@ -84,7 +101,7 @@ export default function EditExperiencePage() {
           category: experienceRes.category || '',
           occasions: experienceRes.occasions || [],
           starting_price: experienceRes.starting_price || 0,
-          price_options: experienceRes.price_options || [],
+          price_options: experienceRes.price_options || {},
           currency: experienceRes.currency || 'MYR',
           is_variable_pricing: experienceRes.is_variable_pricing || false,
           vendor_id: experienceRes.vendor_id || undefined,

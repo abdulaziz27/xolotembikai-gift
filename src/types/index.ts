@@ -139,42 +139,77 @@ export interface Database {
 }
 
 // Vendor types
-export interface Vendor {
+export interface Vendor extends Record<string, unknown> {
   id: string
   name: string
+  description: string
   email: string
-  description?: string
-  logo_url?: string
-  website_url?: string
-  contact_person?: string
   phone?: string
+  website_url?: string
   address?: string
-  api_integration_type: 'manual' | 'api'
-  api_credentials?: Record<string, any>
+  logo_url?: string
+  status: 'active' | 'pending' | 'inactive'
   commission_rate: number
-  status: 'pending' | 'active' | 'inactive' | 'rejected'
+  api_integration_type: 'api' | 'manual'
+  api_credentials?: {
+    endpoint?: string
+    api_key?: string
+    webhook_url?: string
+  }
   is_active: boolean
   created_at: string
   updated_at: string
   total_experiences?: number
-}
-
-export interface CreateVendorData {
-  name: string
-  email: string
-  description?: string
-  logo_url?: string
-  website_url?: string
   contact_person?: string
-  phone?: string
-  address?: string
-  api_integration_type?: 'manual' | 'api'
-  api_credentials?: Record<string, any>
-  commission_rate?: number
-  status?: 'pending' | 'active' | 'inactive' | 'rejected'
-  is_active?: boolean
 }
 
-export interface UpdateVendorData extends Partial<CreateVendorData> {
+export interface CreateVendorData extends Record<string, unknown> {
+  name: string
+  description: string
+  email: string
+  phone?: string
+  website_url?: string
+  address?: string
+  logo_url?: string
+  status: 'active' | 'pending' | 'inactive'
+  commission_rate: number
+  api_integration_type: 'api' | 'manual'
+  api_credentials?: {
+    endpoint?: string
+    api_key?: string
+    webhook_url?: string
+  }
+  is_active: boolean
+  contact_person?: string
+}
+
+export interface UpdateVendorData extends Record<string, unknown> {
+  name?: string
+  description?: string
+  email?: string
+  phone?: string
+  website_url?: string
+  address?: string
+  logo_url?: string
+  status?: 'active' | 'pending' | 'inactive'
+  commission_rate?: number
+  api_integration_type?: 'api' | 'manual'
+  api_credentials?: {
+    endpoint?: string
+    api_key?: string
+    webhook_url?: string
+  }
+  is_active?: boolean
+  contact_person?: string
+}
+
+export interface Category extends Record<string, unknown> {
   id: string
+  name: string
+  description: string
+  created_at: string
+  updated_at: string
+  total_experiences?: number
+  slug?: string
+  status?: 'active' | 'inactive'
 } 

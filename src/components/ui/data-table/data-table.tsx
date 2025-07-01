@@ -73,6 +73,8 @@ export interface DataTableProps<TData, TValue> {
   size?: "sm" | "md" | "lg"
   stickyHeader?: boolean
   filename?: string
+  initialSelectedRows?: string[]
+  onSelectedRowsChange?: (selectedRows: string[]) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -95,6 +97,8 @@ export function DataTable<TData, TValue>({
   size = "md",
   stickyHeader = false,
   filename = "export",
+  initialSelectedRows = [],
+  onSelectedRowsChange
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -139,8 +143,8 @@ export function DataTable<TData, TValue>({
     }
   }, [rowSelection, onRowSelectionChange])
 
-  const selectedRows = table.getFilteredSelectedRowModel().rows
-  const hasSelectedRows = selectedRows.length > 0
+  const selectedTableRows = table.getFilteredSelectedRowModel().rows
+  const hasSelectedRows = selectedTableRows.length > 0
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -159,7 +163,7 @@ export function DataTable<TData, TValue>({
         data={data}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
-        selectedRows={selectedRows}
+        selectedRows={selectedTableRows}
         hasSelectedRows={hasSelectedRows}
       />
 
@@ -261,7 +265,7 @@ export function DataTable<TData, TValue>({
         <div className="text-sm text-gray-700">
           {hasSelectedRows && (
             <span className="mr-4">
-              {selectedRows.length} of {table.getFilteredRowModel().rows.length} row(s) selected
+              {selectedTableRows.length} of {table.getFilteredRowModel().rows.length} row(s) selected
             </span>
           )}
           Page {table.getState().pagination.pageIndex + 1} of{" "}

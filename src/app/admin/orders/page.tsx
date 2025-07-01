@@ -1,21 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
+import { Plus } from "lucide-react"
 import { OrdersTable } from "./components/orders-table"
-
-interface Order {
-  id: string
-  order_number: string
-  customer_name: string
-  customer_email: string
-  experience_title: string
-  total_amount: number
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'refunded'
-  payment_status: 'pending' | 'paid' | 'failed' | 'refunded'
-  order_date: string
-  experience_date?: string
-  participants: number
-}
+import type { Order } from "@/types/orders"
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -28,7 +17,7 @@ export default function AdminOrdersPage() {
       const data = await response.json()
       
       if (response.ok) {
-        setOrders(data.orders || data || [])
+        setOrders(data.orders || [])
       }
     } catch (error) {
       console.error('Failed to fetch orders:', error)
@@ -47,14 +36,16 @@ export default function AdminOrdersPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
           <p className="text-gray-600 mt-1">
-            Manage bookings and process orders
+            Manage your orders with advanced table features
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="text-sm text-gray-600">
-            Total: {orders.length} orders
-          </div>
-        </div>
+        <Link
+          href="/admin/orders/create"
+          className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-orange-500 text-white rounded-lg hover:shadow-lg transition-all"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Create Order
+        </Link>
       </div>
 
       <OrdersTable 

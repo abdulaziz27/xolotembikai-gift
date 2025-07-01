@@ -1,6 +1,8 @@
 import type { Vendor } from './vendors'
 
-export interface Experience {
+export type { Vendor }
+
+export interface Experience extends Record<string, unknown> {
   id: string;
   title: string;
   slug: string;
@@ -14,19 +16,40 @@ export interface Experience {
   max_participants?: number;
   min_participants?: number;
   location?: string;
+  address?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
   featured_image?: string;
   gallery?: string[];
+  video_url?: string;
+  duration?: string;
+  min_age?: number;
+  difficulty_level?: 'Easy' | 'Moderate' | 'Challenging';
+  redemption_instructions?: string;
   tags?: string[];
   inclusions?: string[];
   exclusions?: string[];
   requirements?: string[];
   cancellation_policy?: string;
+  vendor_type?: 'api' | 'manual';
+  api_endpoint?: string;
+  manual_codes?: string[];
+  seo_title?: string;
+  seo_description?: string;
   status: 'active' | 'draft' | 'archived';
+  published_at?: string;
+  expires_at?: string;
   is_featured: boolean;
+  is_gift_wrappable?: boolean;
+  allows_custom_message?: boolean;
+  allows_scheduling?: boolean;
   rating: number;
   total_reviews: number;
   total_bookings: number;
   currency: string;
+  is_variable_pricing?: boolean;
   price_options?: Record<string, number | string>;
   vendor?: {
     id: string;
@@ -51,11 +74,11 @@ export interface ExperienceReview {
 export interface ExperienceForm {
   title: string;
   short_description: string;
-  long_description: string; // Changed from full_description
+  long_description: string;
   category: string;
   occasions: string[];
   starting_price: number;
-  price_options: number[];
+  price_options: Record<string, number | string>;
   currency: string;
   is_variable_pricing: boolean;
   vendor_id?: string;
@@ -65,19 +88,19 @@ export interface ExperienceForm {
     lat: number;
     lng: number;
   };
-  gallery: string[]; // Changed from images
+  gallery: string[];
   featured_image?: string;
   video_url?: string;
   duration?: string;
-  duration_hours?: number; // Added
+  duration_hours?: number;
   max_participants?: number;
-  min_participants?: number; // Added
+  min_participants?: number;
   min_age?: number;
   difficulty_level?: 'Easy' | 'Moderate' | 'Challenging';
   redemption_instructions?: string;
-  requirements: string[]; // Changed from booking_requirements
-  inclusions: string[]; // Changed from included_items
-  exclusions: string[]; // Changed from excluded_items
+  requirements: string[];
+  inclusions: string[];
+  exclusions: string[];
   cancellation_policy?: string;
   vendor_type: 'api' | 'manual';
   api_endpoint?: string;

@@ -4,17 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Plus } from "lucide-react"
 import { ExperiencesTable } from "./components/experiences-table"
-
-interface Experience {
-  id: string
-  title: string
-  slug: string
-  price: number
-  featured_image: string
-  status: 'active' | 'inactive' | 'draft'
-  created_at: string
-  vendor_name?: string
-}
+import type { Experience } from "@/types/experiences"
 
 export default function AdminExperiencesPage() {
   const [experiences, setExperiences] = useState<Experience[]>([])
@@ -32,9 +22,31 @@ export default function AdminExperiencesPage() {
           id: exp.id,
           title: exp.title,
           slug: exp.slug,
-          price: exp.starting_price || exp.price || 0,
+          short_description: exp.short_description,
+          long_description: exp.long_description,
+          category: exp.category,
+          vendor_id: exp.vendor_id,
+          occasions: exp.occasions || [],
+          starting_price: exp.starting_price || exp.price || 0,
+          duration_hours: exp.duration_hours,
+          max_participants: exp.max_participants,
+          min_participants: exp.min_participants,
+          location: exp.location,
           featured_image: exp.featured_image,
+          gallery: exp.gallery || [],
+          tags: exp.tags || [],
+          inclusions: exp.inclusions || [],
+          exclusions: exp.exclusions || [],
+          requirements: exp.requirements || [],
+          cancellation_policy: exp.cancellation_policy,
           status: exp.status,
+          is_featured: exp.is_featured || false,
+          rating: exp.rating || 0,
+          total_reviews: exp.total_reviews || 0,
+          total_bookings: exp.total_bookings || 0,
+          currency: exp.currency || 'MYR',
+          price_options: exp.price_options || {},
+          vendor: exp.vendor || undefined,
           created_at: exp.created_at,
           vendor_name: exp.vendor?.name || 'No Vendor'
         })) || []
@@ -77,4 +89,4 @@ export default function AdminExperiencesPage() {
       />
     </div>
   )
-} 
+}

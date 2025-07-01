@@ -190,6 +190,8 @@ export async function POST(request: NextRequest) {
       vendor_id: body.vendor_id,
       occasions: body.occasions,
       starting_price: body.starting_price,
+      price_options: body.price_options || {},
+      is_variable_pricing: body.is_variable_pricing || false,
       duration_hours: body.duration_hours,
       max_participants: body.max_participants,
       min_participants: body.min_participants,
@@ -236,6 +238,7 @@ export async function POST(request: NextRequest) {
     // Add boolean fields with defaults
     experienceData.allows_custom_message = body.allows_custom_message !== undefined ? body.allows_custom_message : true;
     experienceData.allows_scheduling = body.allows_scheduling !== undefined ? body.allows_scheduling : true;
+    experienceData.is_gift_wrappable = body.is_gift_wrappable !== undefined ? body.is_gift_wrappable : true;
 
     // Use admin client for creating experience to bypass RLS
     const { data: experience, error } = await supabaseAdmin

@@ -4,17 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Plus } from "lucide-react"
 import { CategoriesTable } from "./components/categories-table"
-
-interface Category {
-  id: string
-  name: string
-  slug: string
-  description?: string
-  status: 'active' | 'inactive'
-  total_experiences: number
-  created_at: string
-  updated_at: string
-}
+import { Category } from "@/types"
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -24,10 +14,17 @@ export default function AdminCategoriesPage() {
     try {
       setLoading(true)
       const response = await fetch('/api/categories')
-        const data = await response.json()
+      const data = await response.json()
 
       if (response.ok) {
-        setCategories(data.categories || data || [])
+        // Ensure all required fields are present
+        const validCategories = (data.categories || data || []).map((cat: any) => ({
+          ...cat,
+          description: cat.description || '',
+          status: cat.status || 'active',
+          total_experiences: cat.total_experiences || 0
+        }))
+        setCategories(validCategories)
       }
     } catch (error) {
       console.error('Failed to fetch categories:', error)

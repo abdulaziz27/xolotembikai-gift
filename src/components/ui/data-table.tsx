@@ -15,6 +15,7 @@ import {
   RowSelectionState,
   FilterFn,
   Table as TableInstance,
+  Row,
 } from "@tanstack/react-table"
 import { rankItem } from "@tanstack/match-sorter-utils"
 
@@ -66,7 +67,7 @@ import {
 } from "@/lib/utils/table"
 
 // Enhanced filtering function with fuzzy matching
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+const fuzzyFilter: FilterFn<Record<string, unknown>> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
   addMeta({ itemRank })
   return itemRank.passed

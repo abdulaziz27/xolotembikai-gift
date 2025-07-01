@@ -1,31 +1,30 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { ColumnDef } from "@tanstack/react-table"
-import { Eye, Edit3, Trash2, Tag, Hash } from "lucide-react"
+import { ColumnDef, RowSelectionState } from "@tanstack/react-table"
+import { Tag, Hash, Trash2 } from "lucide-react"
+import { useState } from 'react'
 
 import { DataTable } from "@/components/ui/data-table"
-import { ActionButton, StatusBadge } from "@/components/ui/data-table"
-
-interface Category {
-  id: string
-  name: string
-  slug: string
-  description?: string
-  status: 'active' | 'inactive'
-  total_experiences: number
-  created_at: string
-  updated_at: string
-}
+import { StatusBadge } from "@/components/ui/data-table"
+import { Category } from '@/types'
 
 interface CategoriesTableProps {
   data: Category[]
   loading?: boolean
   onRefresh?: () => void
+  onDelete?: (id: string) => void
+  onEdit?: (id: string) => void
 }
 
-export function CategoriesTable({ data, loading, onRefresh }: CategoriesTableProps) {
+export function CategoriesTable({
+  data,
+  loading = false,
+  onDelete,
+  onEdit
+}: CategoriesTableProps) {
   const router = useRouter()
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   const handleView = (category: Category) => {
     router.push(`/admin/categories/${category.id}`)
@@ -36,48 +35,30 @@ export function CategoriesTable({ data, loading, onRefresh }: CategoriesTablePro
   }
 
   const handleDelete = async (category: Category) => {
-    if (category.total_experiences > 0) {
+    if ((category.total_experiences ?? 0) > 0) {
       alert(`Cannot delete category "${category.name}" because it has ${category.total_experiences} associated experiences.`)
       return
     }
 
-    if (window.confirm(`Are you sure you want to delete category "${category.name}"?`)) {
-      try {
-        const response = await fetch(`/api/categories/${category.id}`, {
-          method: 'DELETE'
-        })
-        if (response.ok) {
-          onRefresh?.()
-        }
-      } catch (error) {
-        console.error('Failed to delete category:', error)
-      }
+    if (onDelete) {
+      onDelete(category.id)
     }
   }
 
-  const handleBulkDelete = async (selectedCategories: Category[]) => {
-    const categoriesWithExperiences = selectedCategories.filter(cat => cat.total_experiences > 0)
+  const handleBulkDelete = async (selectedData: Category[]) => {
+    const categoriesWithExperiences = selectedData.filter(cat => (cat.total_experiences ?? 0) > 0)
     
     if (categoriesWithExperiences.length > 0) {
       alert(`Cannot delete ${categoriesWithExperiences.length} categories because they have associated experiences.`)
       return
     }
 
-    if (window.confirm(`Are you sure you want to delete ${selectedCategories.length} categories?`)) {
-      try {
-        await Promise.all(
-          selectedCategories.map(category => 
-            fetch(`/api/categories/${category.id}`, { method: 'DELETE' })
-          )
-        )
-        onRefresh?.()
-      } catch (error) {
-        console.error('Failed to delete categories:', error)
-      }
+    if (onDelete) {
+      selectedData.forEach(category => onDelete(category.id))
     }
   }
 
-  const columns: ColumnDef<Category>[] = [
+  const columns: ColumnDef<Category, unknown>[] = [
     {
       accessorKey: "name",
       header: "Category",
@@ -139,36 +120,44 @@ export function CategoriesTable({ data, loading, onRefresh }: CategoriesTablePro
       },
     },
     {
+      accessorKey: "updated_at",
+      header: "Updated",
+      cell: ({ getValue }) => {
+        const date = new Date(getValue() as string)
+        return (
+          <div className="text-sm text-gray-600">
+            {date.toLocaleDateString()}
+          </div>
+        )
+      },
+    },
+    {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => (
-        <div className="flex items-center gap-1">
-          <ActionButton
-            variant="view"
-            icon={<Eye className="w-4 h-4" />}
-            tooltip="View Category"
-            onClick={() => handleView(row.original)}
-          />
-          <ActionButton
-            variant="edit"
-            icon={<Edit3 className="w-4 h-4" />}
-            tooltip="Edit Category"
-            onClick={() => handleEdit(row.original)}
-          />
-          <ActionButton
-            variant="delete"
-            icon={<Trash2 className="w-4 h-4" />}
-            tooltip={
-              row.original.total_experiences > 0 
-                ? `Cannot delete - ${row.original.total_experiences} experiences linked`
-                : "Delete Category"
-            }
-            disabled={row.original.total_experiences > 0}
-            onClick={() => handleDelete(row.original)}
-          />
-        </div>
-      ),
-    },
+      cell: ({ row }) => {
+        const category = row.original
+
+        return (
+          <div className="flex items-center gap-4">
+            {onEdit && (
+              <button
+                onClick={() => onEdit(category.id)}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                Edit
+              </button>
+            )}
+            <button
+              onClick={() => handleDelete(category)}
+              className="text-red-600 hover:text-red-800"
+              disabled={(category.total_experiences ?? 0) > 0}
+            >
+              Delete
+            </button>
+          </div>
+        )
+      }
+    }
   ]
 
   const bulkActions = [
@@ -181,13 +170,14 @@ export function CategoriesTable({ data, loading, onRefresh }: CategoriesTablePro
   ]
 
   return (
-    <DataTable
+    <DataTable<Category, unknown>
       columns={columns}
       data={data}
       loading={loading}
       enableSorting={true}
-      enableGlobalFilter={true}
+      enableFiltering={true}
       enableRowSelection={true}
+      onRowSelectionChange={setRowSelection}
       enableExport={true}
       onBulkAction={(action, selectedData) => {
         if (action === "delete") {

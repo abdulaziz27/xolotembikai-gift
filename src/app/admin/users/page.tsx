@@ -1,20 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
-import { UserPlus } from "lucide-react"
+import { Plus } from "lucide-react"
 import { UsersTable } from "./components/users-table"
-
-interface User {
-  id: string
-  email: string
-  full_name?: string
-  role: 'user' | 'admin' | 'vendor'
-  status: 'active' | 'inactive' | 'suspended'
-  last_sign_in?: string
-  created_at: string
-  total_orders?: number
-}
+import type { User } from "@/types/users"
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([])
@@ -27,7 +16,7 @@ export default function AdminUsersPage() {
       const data = await response.json()
       
       if (response.ok) {
-        setUsers(data.users || data || [])
+        setUsers(data.users || [])
       }
     } catch (error) {
       console.error('Failed to fetch users:', error)
@@ -57,13 +46,15 @@ export default function AdminUsersPage() {
             Manage user accounts and permissions
           </p>
         </div>
-        <Link
-          href="/admin/users/create"
-          className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
+        <button
+          className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-orange-500 text-white rounded-lg hover:shadow-lg transition-all"
+          onClick={() => {
+            // TODO: Implement user creation
+          }}
         >
-          <UserPlus className="w-4 h-4 mr-2" />
-          Add User
-        </Link>
+          <Plus className="w-4 h-4 mr-2" />
+          Create User
+        </button>
       </div>
 
       {/* Statistics Cards */}

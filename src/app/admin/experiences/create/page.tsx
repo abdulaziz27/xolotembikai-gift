@@ -21,29 +21,29 @@ export default function CreateExperiencePage() {
   const [formData, setFormData] = useState<ExperienceForm>({
     title: '',
     short_description: '',
-    long_description: '', // Changed from full_description
+    long_description: '',
     category: '',
     occasions: [],
     starting_price: 0,
-    price_options: [],
-    currency: 'MYR', // Changed default to MYR
+    price_options: {},
+    currency: 'MYR',
     is_variable_pricing: false,
     vendor_id: undefined,
     location: '',
     address: '',
-    gallery: [], // Changed from images
+    gallery: [],
     featured_image: '',
     video_url: '',
     duration: '',
-    duration_hours: undefined, // Added
+    duration_hours: undefined,
     max_participants: 0,
-    min_participants: 1, // Added
+    min_participants: 1,
     min_age: 0,
     difficulty_level: 'Easy',
     redemption_instructions: '',
-    requirements: [], // Changed from booking_requirements
-    inclusions: [], // Changed from included_items
-    exclusions: [], // Changed from excluded_items
+    requirements: [],
+    inclusions: [],
+    exclusions: [],
     cancellation_policy: '',
     vendor_type: 'manual',
     api_endpoint: '',

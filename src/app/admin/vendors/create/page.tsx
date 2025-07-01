@@ -6,30 +6,59 @@ import Link from "next/link"
 import { ArrowLeft, Save, X, Upload, Image as ImageIcon } from "lucide-react"
 import { vendorService } from "@/lib/services/vendors"
 import { useToast } from "@/components/ui/toast"
-import type { VendorFormData, CreateVendorData } from "@/types"
+import { VendorFormData, CreateVendorData } from "@/types/vendors"
 import { createClient } from "@/lib/supabase/client"
+
+interface FormErrors {
+  name?: string
+  email?: string
+  commission_rate?: string
+  website_url?: string
+  [key: string]: string | undefined
+}
+
+interface VendorForm {
+  name: string
+  description: string
+  email: string
+  phone: string
+  website_url: string
+  address: string
+  logo_url: string
+  status: 'active' | 'pending' | 'inactive'
+  commission_rate: number
+  api_integration_type: 'api' | 'manual'
+  api_credentials: {
+    endpoint: string
+    api_key: string
+    webhook_url: string
+  }
+}
 
 export default function CreateVendorPage() {
   const router = useRouter()
   const { addToast } = useToast()
   
-  const [formData, setFormData] = useState<VendorFormData>({
+  const [formData, setFormData] = useState<VendorForm>({
     name: "",
-    email: "",
     description: "",
-    logo_url: "",
-    website_url: "",
-    contact_person: "",
+    email: "",
     phone: "",
+    website_url: "",
     address: "",
+    logo_url: "",
+    status: "pending",
+    commission_rate: 10,
     api_integration_type: "manual",
-    commission_rate: 10.00,
-    status: "active",
-    is_active: true
+    api_credentials: {
+      endpoint: "",
+      api_key: "",
+      webhook_url: ""
+    }
   })
   
   const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [errors, setErrors] = useState<FormErrors>({})
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
 
@@ -112,7 +141,7 @@ export default function CreateVendorPage() {
   }
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: FormErrors = {}
 
     if (!formData.name.trim()) {
       newErrors.name = "Vendor name is required"
@@ -138,15 +167,14 @@ export default function CreateVendorPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!validateForm()) {
-      addToast({ type: "error", title: "Please fix the form errors" })
-      return
-    }
-
     setLoading(true)
-    
+
     try {
+      if (!validateForm()) {
+        setLoading(false)
+        return
+      }
+
       let logoUrl = formData.logo_url
 
       // Upload logo if a file was selected
@@ -154,9 +182,19 @@ export default function CreateVendorPage() {
         logoUrl = await uploadLogo(logoFile)
       }
 
-      const vendorData = {
-        ...formData,
-        logo_url: logoUrl
+      const vendorData: CreateVendorData = {
+        name: formData.name,
+        description: formData.description,
+        email: formData.email,
+        phone: formData.phone || undefined,
+        website_url: formData.website_url || undefined,
+        address: formData.address || undefined,
+        logo_url: logoUrl || undefined,
+        status: formData.status,
+        commission_rate: formData.commission_rate,
+        api_integration_type: formData.api_integration_type,
+        api_credentials: formData.api_credentials,
+        is_active: formData.status === 'active'
       }
 
       const vendor = await vendorService.createVendor(vendorData)
@@ -312,21 +350,6 @@ export default function CreateVendorPage() {
           <h2 className="text-xl font-semibold mb-6 text-gray-900">Contact Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="contact_person" className="block text-sm font-medium text-gray-700 mb-2">
-                Contact Person
-              </label>
-              <input
-                type="text"
-                id="contact_person"
-                name="contact_person"
-                value={formData.contact_person}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter contact person name"
-              />
-            </div>
-
-            <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                 Phone Number
               </label>
@@ -439,20 +462,6 @@ export default function CreateVendorPage() {
                 <option value="pending">Pending</option>
                 <option value="rejected">Rejected</option>
               </select>
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="is_active"
-                name="is_active"
-                checked={formData.is_active}
-                onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="is_active" className="ml-2 block text-sm text-gray-900">
-                Active for customers
-              </label>
             </div>
           </div>
         </div>

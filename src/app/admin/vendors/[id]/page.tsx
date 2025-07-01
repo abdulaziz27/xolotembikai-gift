@@ -15,7 +15,7 @@ interface VendorDetailPageProps {
 
 export default function VendorDetailPage({ params }: VendorDetailPageProps) {
   const router = useRouter()
-  const { showToast } = useToast()
+  const { addToast } = useToast()
   
   const [vendor, setVendor] = useState<Vendor | null>(null)
   const [loading, setLoading] = useState(true)
@@ -31,7 +31,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
         await fetchVendor(resolvedParams.id)
       } catch (error) {
         console.error("Failed to resolve params:", error)
-        showToast("Failed to load vendor", "error")
+        addToast({ type: "error", title: "Failed to load vendor data" })
         router.push("/admin/vendors")
       }
     }
@@ -46,7 +46,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
       setVendor(vendorData)
     } catch (error) {
       console.error("Failed to fetch vendor:", error)
-      showToast("Failed to load vendor details", "error")
+      addToast({ type: "error", title: "Failed to load vendor data" })
       router.push("/admin/vendors")
     } finally {
       setLoading(false)
@@ -59,14 +59,11 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
     setDeleting(true)
     try {
       await vendorService.deleteVendor(vendor.id)
-      showToast("Vendor deleted successfully", "success")
+      addToast({ type: "success", title: "Vendor deleted successfully" })
       router.push("/admin/vendors")
     } catch (error) {
       console.error("Failed to delete vendor:", error)
-      showToast(
-        error instanceof Error ? error.message : "Failed to delete vendor",
-        "error"
-      )
+      addToast({ type: "error", title: error instanceof Error ? error.message : "Failed to delete vendor" })
     } finally {
       setDeleting(false)
       setShowDeleteDialog(false)

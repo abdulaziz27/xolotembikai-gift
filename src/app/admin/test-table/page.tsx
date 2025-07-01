@@ -5,7 +5,7 @@ import { ActionButton, StatusBadge } from "@/components/ui/data-table"
 import { ColumnDef } from "@tanstack/react-table"
 import { Eye, Edit3, Trash2 } from "lucide-react"
 
-interface TestData {
+interface TestData extends Record<string, unknown> {
   id: string
   name: string
   email: string

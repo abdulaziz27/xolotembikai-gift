@@ -290,7 +290,7 @@ export default function ExperiencesPage() {
                     <h3 className="text-lg font-semibold text-gray-900">Price Range</h3>
                   </div>
                   <div className="space-y-3">
-                    {priceRanges.map((range, index) => (
+                    {filterOptions?.priceRanges.map((range, index) => (
                       <label key={index} className="flex items-center justify-between cursor-pointer">
                         <div className="flex items-center">
                           <input
@@ -313,7 +313,7 @@ export default function ExperiencesPage() {
                     <h3 className="text-lg font-semibold text-gray-900">Occasion</h3>
                   </div>
                   <div className="space-y-3">
-                    {occasions.map((occasion, index) => (
+                    {filterOptions?.occasions.map((occasion, index) => (
                       <label key={index} className="flex items-center justify-between cursor-pointer">
                         <div className="flex items-center">
                           <input
@@ -336,7 +336,7 @@ export default function ExperiencesPage() {
                     <h3 className="text-lg font-semibold text-gray-900">Perfect For</h3>
                   </div>
                   <div className="space-y-3">
-                    {perfectFor.map((item, index) => (
+                    {filterOptions?.perfectFor.map((item, index) => (
                       <label key={index} className="flex items-center justify-between cursor-pointer">
                         <div className="flex items-center">
                           <input
@@ -359,7 +359,7 @@ export default function ExperiencesPage() {
                     <h3 className="text-lg font-semibold text-gray-900">Interests</h3>
                   </div>
                   <div className="space-y-3">
-                    {interests.map((interest, index) => (
+                    {filterOptions?.interests.map((interest, index) => (
                       <label key={index} className="flex items-center justify-between cursor-pointer">
                         <div className="flex items-center">
                           <input
@@ -382,7 +382,7 @@ export default function ExperiencesPage() {
                     <h3 className="text-lg font-semibold text-gray-900">Gift Type</h3>
                   </div>
                   <div className="space-y-3">
-                    {giftTypes.map((type, index) => (
+                    {filterOptions?.giftTypes.map((type, index) => (
                       <label key={index} className="flex items-center justify-between cursor-pointer">
                         <div className="flex items-center">
                           <input
@@ -461,9 +461,10 @@ export default function ExperiencesPage() {
                 </div>
               ) : (
                 experiences.map((experience) => {
-                  const hasDiscount = experience.price_options?.length > 0
+                  const priceOptions = experience.price_options || {}
+                  const hasDiscount = Object.keys(priceOptions).length > 0
                   const discountPercentage = hasDiscount 
-                    ? experienceUtils.calculateDiscount(experience.price_options[0], experience.starting_price)
+                    ? experienceUtils.calculateDiscount(Number(Object.values(priceOptions)[0]), experience.starting_price)
                     : 0
 
                   return (
@@ -477,12 +478,14 @@ export default function ExperiencesPage() {
                         {/* Badge */}
                         {experience.is_featured && (
                           <div className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-purple-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
-                            Popular
+                            Featured
                           </div>
                         )}
-                        {discountPercentage > 0 && (
-                          <div className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-green-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
-                            {discountPercentage}% OFF
+
+                        {/* Discount Badge */}
+                        {hasDiscount && (
+                          <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-orange-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
+                            Save {discountPercentage}%
                           </div>
                         )}
                         
@@ -523,7 +526,7 @@ export default function ExperiencesPage() {
                             </span>
                             {hasDiscount && (
                               <span className="text-gray-400 line-through text-xs sm:text-sm">
-                                {experienceUtils.formatPrice(experience.price_options[0], experience.currency)}
+                                {experienceUtils.formatPrice(Number(Object.values(priceOptions)[0]), experience.currency)}
                               </span>
                             )}
                           </div>

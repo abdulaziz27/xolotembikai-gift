@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Star, MapPin, Phone, Heart, Share, Calendar, ChevronDown, ChevronUp, Check, Gift } from 'lucide-react'
 import Image from 'next/image'
@@ -12,7 +12,7 @@ interface ExperienceDetailProps {
   params: Promise<{ slug: string }>
 }
 
-export default function ExperienceDetailPage({ params }: ExperienceDetailProps) {
+function ExperienceDetailContent({ params }: ExperienceDetailProps) {
   const [experienceData, setExperienceData] = useState<Experience | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -88,7 +88,7 @@ export default function ExperienceDetailPage({ params }: ExperienceDetailProps) 
     location: {
       name: experienceData.vendor?.name || 'Experience Location',
       address: experienceData.address || experienceData.location || 'Location',
-      phone: experienceData.vendor?.phone || 'Contact for details'
+      phone: 'Contact for details'
     },
     badges: [
       { icon: Star, text: `${experienceUtils.formatRating(experienceData.rating)} Rating`, color: "text-yellow-500" },
@@ -98,7 +98,7 @@ export default function ExperienceDetailPage({ params }: ExperienceDetailProps) 
       { icon: Calendar, text: "Valid 6-12 Months", color: "text-red-500" }
     ],
     description: experienceData.long_description,
-    includes: experienceData.inclusions,
+    includes: experienceData.inclusions || [],
     images: experienceData.featured_image 
       ? [experienceData.featured_image, ...(Array.isArray(experienceData.gallery) ? experienceData.gallery : JSON.parse(experienceData.gallery || '[]')).slice(0, 4)]
       : [
@@ -871,5 +871,17 @@ export default function ExperienceDetailPage({ params }: ExperienceDetailProps) 
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ExperienceDetailPage(props: ExperienceDetailProps) {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+      </div>
+    }>
+      <ExperienceDetailContent {...props} />
+    </Suspense>
   )
 } 

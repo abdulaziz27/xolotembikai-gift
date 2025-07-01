@@ -244,11 +244,11 @@ export default function ExperienceDetailPage() {
           </div>
 
           {/* Inclusions & Exclusions */}
-          {(experience.inclusions?.length > 0 || experience.exclusions?.length > 0) && (
+          {((experience.inclusions && experience.inclusions.length > 0) || (experience.exclusions && experience.exclusions.length > 0)) && (
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">What's Included</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {experience.inclusions?.length > 0 && (
+                {experience.inclusions && experience.inclusions.length > 0 && (
                   <div>
                     <h3 className="text-sm font-medium text-green-700 mb-2">Included</h3>
                     <ul className="space-y-1">
@@ -262,7 +262,7 @@ export default function ExperienceDetailPage() {
                   </div>
                 )}
                 
-                {experience.exclusions?.length > 0 && (
+                {experience.exclusions && experience.exclusions.length > 0 && (
                   <div>
                     <h3 className="text-sm font-medium text-red-700 mb-2">Not Included</h3>
                     <ul className="space-y-1">
@@ -330,7 +330,7 @@ export default function ExperienceDetailPage() {
           </div>
 
           {/* Tags */}
-          {experience.tags?.length > 0 && (
+          {experience.tags && experience.tags.length > 0 && (
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags</h3>
               <div className="flex flex-wrap gap-2">

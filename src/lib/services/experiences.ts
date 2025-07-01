@@ -145,7 +145,17 @@ export const experienceService = {
 };
 
 // Export commonly used functions
-export const getAllExperiences = (params?: any) => experienceService.getExperiences(params);
+export const getAllExperiences = (params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  priceMin?: number;
+  priceMax?: number;
+  occasions?: string[];
+  sortBy?: string;
+  status?: string;
+}) => experienceService.getExperiences(params);
 export const getExperienceById = (id: string) => experienceService.getExperienceById(id);
 export const getExperienceBySlug = (slug: string) => experienceService.getExperienceBySlug(slug);
 export const createExperience = (data: ExperienceForm) => experienceService.createExperience(data);

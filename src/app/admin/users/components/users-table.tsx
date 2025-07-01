@@ -2,21 +2,11 @@
 
 import { useRouter } from "next/navigation"
 import { ColumnDef } from "@tanstack/react-table"
-import { Eye, Edit3, Shield, ShieldCheck, Mail, User, Calendar } from "lucide-react"
+import { Eye, Edit3, Shield, ShieldCheck, Mail, User as UserIcon, Calendar } from "lucide-react"
 
 import { DataTable } from "@/components/ui/data-table"
 import { ActionButton, StatusBadge } from "@/components/ui/data-table"
-
-interface User {
-  id: string
-  email: string
-  full_name?: string
-  role: 'user' | 'admin' | 'vendor'
-  status: 'active' | 'inactive' | 'suspended'
-  last_sign_in?: string
-  created_at: string
-  total_orders?: number
-}
+import type { User } from "@/types/users"
 
 interface UsersTableProps {
   data: User[]
@@ -88,7 +78,7 @@ export function UsersTable({ data, loading, onRefresh }: UsersTableProps) {
       cell: ({ getValue, row }) => (
         <div>
           <div className="font-medium text-gray-900 flex items-center">
-            <User className="w-4 h-4 mr-2 text-gray-400" />
+            <UserIcon className="w-4 h-4 mr-2 text-gray-400" />
             {row.original.full_name || getValue() as string}
           </div>
           {row.original.full_name && (

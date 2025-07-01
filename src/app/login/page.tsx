@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import LoginForm from '@/components/auth/login-form'
 import Link from 'next/link'
 import { Heart } from 'lucide-react'
@@ -26,7 +27,19 @@ export default function LoginPage() {
 
         {/* Login Form Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <LoginForm />
+          <Suspense fallback={
+            <div className="space-y-6">
+              <div className="animate-pulse bg-gray-200 h-10 rounded-xl"></div>
+              <div className="animate-pulse bg-gray-200 h-10 rounded-xl"></div>
+              <div className="flex justify-between">
+                <div className="animate-pulse bg-gray-200 h-5 w-24 rounded"></div>
+                <div className="animate-pulse bg-gray-200 h-5 w-32 rounded"></div>
+              </div>
+              <div className="animate-pulse bg-gray-200 h-10 rounded-xl"></div>
+            </div>
+          }>
+            <LoginForm />
+          </Suspense>
         </div>
 
         {/* Footer */}

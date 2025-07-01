@@ -8,14 +8,33 @@ interface RichTextEditorProps {
   placeholder?: string
 }
 
+interface TiptapEditor {
+  destroy: () => void
+  getHTML: () => string
+}
+
+interface TiptapExtension {
+  configure: (options: Record<string, unknown>) => TiptapExtension
+}
+
 declare global {
   interface Window {
-    Editor: any
-    StarterKit: any
-    Image: any
-    Link: any
-    TextAlign: any
-    Underline: any
+    Editor: new (config: {
+      element: HTMLElement
+      extensions: TiptapExtension[]
+      content: string
+      onUpdate: (params: { editor: TiptapEditor }) => void
+      editorProps: {
+        attributes: {
+          class: string
+        }
+      }
+    }) => TiptapEditor
+    StarterKit: TiptapExtension
+    Image: TiptapExtension
+    Link: TiptapExtension
+    TextAlign: TiptapExtension
+    Underline: TiptapExtension
   }
 }
 
@@ -26,7 +45,7 @@ export default function RichTextEditor({
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
   const [isLoaded, setIsLoaded] = useState(false)
-  const editorInstanceRef = useRef<any>(null)
+  const editorInstanceRef = useRef<TiptapEditor | null>(null)
 
   useEffect(() => {
     // Load Tiptap from CDN
@@ -81,7 +100,7 @@ export default function RichTextEditor({
             window.Underline,
           ],
           content: initialValue,
-          onUpdate: ({ editor }: { editor: any }) => {
+          onUpdate: ({ editor }: { editor: TiptapEditor }) => {
             const content = editor.getHTML()
             onChange?.(content)
           },

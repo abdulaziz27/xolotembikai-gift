@@ -110,7 +110,7 @@ export function ExperiencesTable({ data, loading, onRefresh }: ExperiencesTableP
   ]
 
   return (
-    <DataTable
+    <DataTable<Experience, unknown>
       columns={columns}
       data={data}
       loading={loading}

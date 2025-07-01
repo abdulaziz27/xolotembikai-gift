@@ -101,7 +101,7 @@ export const getAriaLabel = (column: string, isSorted: false | 'asc' | 'desc'): 
 }
 
 // Export utilities
-export const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+export const fuzzyFilter: FilterFn<Record<string, unknown>> = (row, columnId, value, addMeta) => {
   // Rank the item
   const itemRank = rankItem(row.getValue(columnId), value)
 
