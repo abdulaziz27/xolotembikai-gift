@@ -10,7 +10,7 @@ export default function AboutPage() {
       <section className="pt-20 pb-16 bg-gradient-to-br from-purple-50 via-white to-orange-50 min-h-screen flex items-center">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-6">
-            We&apos;re{' '}
+            We're{' '}
             <span className="bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">
               Givva
             </span>
@@ -130,14 +130,14 @@ export default function AboutPage() {
             </p>
             
             <p>
-              Today, we&apos;re proud to be the platform that helps millions create{' '}
+              Today, we're proud to be the platform that helps millions create{' '}
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-semibold">
                 personalized gifting experiences that matter
               </span>. We believe in the power of connection, the beauty of thoughtfulness, and the magic that happens when technology meets genuine human emotion.
             </p>
             
             <p className="font-semibold text-gray-900">
-              At Givva, we&apos;re not just changing how gifts are given – we&apos;re transforming how relationships are celebrated, one meaningful experience at a time.
+              At Givva, we're not just changing how gifts are given – we're transforming how relationships are celebrated, one meaningful experience at a time.
             </p>
           </div>
         </div>
@@ -172,7 +172,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold mb-4">Innovation</h3>
               <p className="text-gray-600 leading-relaxed">
-                We constantly push the boundaries of what&apos;s possible in gifting.
+                We constantly push the boundaries of what's possible in gifting.
               </p>
             </div>
             
@@ -182,7 +182,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold mb-4">Connection</h3>
               <p className="text-gray-600 leading-relaxed">
-                At our core, we&apos;re about bringing people together.
+                At our core, we're about bringing people together.
               </p>
             </div>
             
@@ -203,7 +203,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold mb-4">Thoughtfulness</h3>
               <p className="text-gray-600 leading-relaxed">
-                We constantly push the boundaries of what&apos;s possible in gifting.
+                We constantly push the boundaries of what's possible in gifting.
               </p>
             </div>
             
@@ -213,7 +213,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold mb-4">Excellence</h3>
               <p className="text-gray-600 leading-relaxed">
-                At our core, we&apos;re about bringing people together.
+                At our core, we're about bringing people together.
               </p>
             </div>
           </div>
@@ -239,7 +239,7 @@ export default function AboutPage() {
                 Revolutionizing <span className="bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">Gift-Giving</span>
               </h3>
               <p className="text-lg text-gray-700 mb-8 leading-relaxed">
-                Our platform combines cutting-edge technology with human intuition to create gifting experiences that go beyond the ordinary. We don&apos;t just deliver gifts—we deliver joy, surprise, and connection.
+                Our platform combines cutting-edge technology with human intuition to create gifting experiences that go beyond the ordinary. We don't just deliver gifts—we deliver joy, surprise, and connection.
               </p>
               <button className="bg-gradient-to-r from-purple-600 to-orange-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300">
                 See How It Works

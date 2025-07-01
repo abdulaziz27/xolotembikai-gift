@@ -50,7 +50,7 @@ export default function PartnerPage() {
     {
       icon: Utensils,
       title: "Restaurant Owners",
-              subtitle: "Cooking classes, tasting menus, chef&apos;s table experiences, culinary tours",
+              subtitle: "Cooking classes, tasting menus, chef's table experiences, culinary tours",
       perfect: "Perfect for: Restaurant owners, executive chefs, culinary teams"
     },
     {
@@ -185,7 +185,7 @@ export default function PartnerPage() {
               Are You a Good Fit?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              We&apos;re looking for passionate professionals and business owners who want to share their expertise and create memorable experiences for others.
+              We're looking for passionate professionals and business owners who want to share their expertise and create memorable experiences for others.
             </p>
           </div>
           
@@ -292,10 +292,10 @@ export default function PartnerPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Let&apos;s Turn Your Services Into Sought-After Gifts
+              Let's Turn Your Services Into Sought-After Gifts
             </h2>
             <p className="text-xl text-gray-600">
-              Fill out the form and we&apos;ll get back to you within 2 business days.
+              Fill out the form and we'll get back to you within 2 business days.
             </p>
           </div>
           
@@ -361,8 +361,8 @@ export default function PartnerPage() {
                 <select className="w-full px-6 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900">
                   <option value="">Do you already have gift cards or packages?</option>
                   <option value="yes">Yes, we have existing gift offerings</option>
-                  <option value="no">No, but we&apos;re interested in creating them</option>
-                  <option value="considering">We&apos;re considering it</option>
+                  <option value="no">No, but we're interested in creating them</option>
+                  <option value="considering">We're considering it</option>
                 </select>
               </div>
               

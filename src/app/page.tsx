@@ -88,7 +88,7 @@ export default function Home() {
             <div className="space-y-8">
               <div className="space-y-4">
                 <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
-                  Don&apos;t Give{' '}
+                  Don't Give{' '}
                   <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     Boring
                   </span>{' '}
@@ -101,7 +101,7 @@ export default function Home() {
                   <span className="text-purple-600 font-semibold">unforgettable experiences</span>{' '}
                   that create{' '}
                   <span className="text-pink-600 font-semibold">lasting memories</span>.
-                  From thrilling adventures to relaxing retreats - we&apos;ve got the perfect gift for everyone.
+                  From thrilling adventures to relaxing retreats - we've got the perfect gift for everyone.
                 </p>
               </div>
 
@@ -311,7 +311,7 @@ export default function Home() {
                 { name: 'Birthday', emoji: '🎂', count: 120, description: 'Celebrate another year with unforgettable experiences' },
                 { name: 'Anniversary', emoji: '💖', count: 85, description: 'Romantic experiences for special milestones' },
                 { name: 'Graduation', emoji: '🎓', count: 65, description: 'Celebrate achievements with memorable rewards' },
-                { name: "Mother&apos;s Day", emoji: '🌸', count: 120, description: 'Show appreciation with relaxing experiences' }
+                { name: "Mother's Day", emoji: '🌸', count: 120, description: 'Show appreciation with relaxing experiences' }
               ].map((occasion) => (
                 <div key={occasion.name} className="bg-white rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 cursor-pointer group relative">
                   <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full">
@@ -458,7 +458,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Customers Say</h2>
-            <p className="text-xl text-gray-600">Real stories from people who&apos;ve created unforgettable memories</p>
+            <p className="text-xl text-gray-600">Real stories from people who've created unforgettable memories</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">

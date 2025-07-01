@@ -10,6 +10,26 @@ export interface SignupData {
   confirmPassword: string
 }
 
+export type UserRole = 'user' | 'admin'
+
+export interface Profile {
+  id: string
+  full_name: string
+  email: string
+  role: UserRole
+  avatar_url?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminUser {
+  id: string
+  profile_id: string
+  permissions: string[]
+  created_at: string
+  updated_at: string
+}
+
 export interface AuthUser {
   id: string
   email: string

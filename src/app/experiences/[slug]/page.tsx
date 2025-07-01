@@ -1,19 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Star, MapPin, Phone, Heart, Share, Calendar, ChevronDown, ChevronUp, Check, Gift } from 'lucide-react'
 import Image from 'next/image'
+import { Experience } from '@/types/experiences'
+import { experienceService, experienceUtils } from '@/lib/services/experiences'
 
 interface ExperienceDetailProps {
   params: Promise<{ slug: string }>
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProps) {
+export default function ExperienceDetailPage({ params }: ExperienceDetailProps) {
+  const [experienceData, setExperienceData] = useState<Experience | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  
   // Get experience type from URL params
   const searchParams = useSearchParams()
-  const experienceType = searchParams.get('type') || 'booking' // default to booking if no type specified
+  const experienceType = searchParams.get('type') || (experienceData ? experienceUtils.getExperienceType(experienceData.category) : 'booking')
   
   // Set default tab based on experience type
   const defaultTab = experienceType === 'gift-card' ? 'how-it-works' : 'whats-included'
@@ -27,43 +32,81 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
   const [showCurrencySelector, setShowCurrencySelector] = useState(false)
   const [selectedGiftAmount, setSelectedGiftAmount] = useState(100)
 
-  // Mock data - in real app this would come from API based on params.slug
+  // Fetch experience data
+  useEffect(() => {
+    const fetchExperience = async () => {
+      try {
+        setLoading(true)
+        const { slug } = await params
+        const data = await experienceService.getExperienceBySlug(slug)
+        setExperienceData(data)
+      } catch (error) {
+        console.error('Error fetching experience:', error)
+        setError('Experience not found')
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchExperience()
+  }, [params])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading experience...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !experienceData) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Experience Not Found</h1>
+          <p className="text-gray-600 mb-4">{error || 'The experience you\'re looking for doesn\'t exist.'}</p>
+          <a href="/experiences" className="text-purple-600 hover:text-purple-800">
+            ← Back to Experiences
+          </a>
+        </div>
+      </div>
+    )
+  }
+
+  // Transform data for component compatibility
   const experience = {
-    title: "Luxury Spa Day Experience",
-    provider: "Grand Serenity Hotel",
-    rating: 4.9,
-    originalPrice: 399,
-    discountedPrice: 299,
-    discount: 25,
+    title: experienceData.title,
+    provider: experienceData.vendor?.name || 'Experience Provider',
+    rating: experienceData.rating,
+    originalPrice: experienceData.starting_price + 50,
+    discountedPrice: experienceData.starting_price,
+    discount: 50,
     location: {
-      name: "Grand Serenity Hotel",
-      address: "123 Wellness Boulevard, Downtown",
-      phone: "(555) 123-4567"
+      name: experienceData.vendor?.name || 'Experience Location',
+      address: experienceData.address || experienceData.location || 'Location',
+      phone: experienceData.vendor?.phone || 'Contact for details'
     },
     badges: [
-      { icon: Star, text: "4.9 Rating", color: "text-yellow-500" },
+      { icon: Star, text: `${experienceUtils.formatRating(experienceData.rating)} Rating`, color: "text-yellow-500" },
       { icon: Gift, text: "Instant Delivery", color: "text-orange-500" },
       { icon: Phone, text: "Mobile Friendly", color: "text-blue-500" },
       { icon: Check, text: "100% Satisfaction", color: "text-pink-500" },
       { icon: Calendar, text: "Valid 6-12 Months", color: "text-red-500" }
     ],
-    description: "Indulge in a full day of relaxation and rejuvenation at Grand Serenity Hotel&apos;s award-winning spa. This premium experience includes access to all spa facilities, a 90-minute signature massage, facial treatment, and a healthy gourmet lunch.",
-    includes: [
-      "90-minute signature massage",
-      "Access to sauna, steam room & jacuzzi", 
-      "Healthy gourmet lunch",
-      "Spa amenities & robe",
-      "Premium facial treatment",
-      "Relaxation lounge access",
-      "Complimentary refreshments"
-    ],
-    images: [
-      "https://via.placeholder.com/600x400/A855F7/FFFFFF?text=Spa+Experience",
-      "https://via.placeholder.com/300x200/F97316/FFFFFF?text=Massage", 
-      "https://via.placeholder.com/300x200/EC4899/FFFFFF?text=Sauna",
-      "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=Jacuzzi",
-      "https://via.placeholder.com/300x200/EF4444/FFFFFF?text=Relaxation"
-    ]
+    description: experienceData.long_description,
+    includes: experienceData.inclusions,
+    images: experienceData.featured_image 
+      ? [experienceData.featured_image, ...(Array.isArray(experienceData.gallery) ? experienceData.gallery : JSON.parse(experienceData.gallery || '[]')).slice(0, 4)]
+      : [
+          "https://via.placeholder.com/600x400/A855F7/FFFFFF?text=" + encodeURIComponent(experienceData.category),
+          "https://via.placeholder.com/300x200/F97316/FFFFFF?text=Image1", 
+          "https://via.placeholder.com/300x200/EC4899/FFFFFF?text=Image2",
+          "https://via.placeholder.com/300x200/8B5CF6/FFFFFF?text=Image3",
+          "https://via.placeholder.com/300x200/EF4444/FFFFFF?text=Image4"
+        ]
   }
 
   const currencies = [
@@ -205,7 +248,7 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
             <div className="mb-8">
               <div className="flex flex-wrap border-b border-gray-200">
                 {(experienceType === 'booking' ? [
-                  { id: 'whats-included', label: "What&apos;s Included" },
+                  { id: 'whats-included', label: "What's Included" },
                   { id: 'redemption', label: 'Redemption' },
                   { id: 'faq', label: 'FAQ' },
                   { id: 'fine-print', label: 'Fine Print' }
@@ -293,7 +336,7 @@ export default function ExperienceDetailPage({ params: _ }: ExperienceDetailProp
                   <h2 className="text-xl font-bold text-gray-900 mb-6">Gift Card Benefits</h2>
                   <div className="grid sm:grid-cols-2 gap-8">
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-4">What&apos;s Included:</h3>
+                      <h3 className="text-lg font-bold text-gray-900 mb-4">What's Included:</h3>
                       <div className="space-y-3">
                         <div className="flex items-start space-x-3">
                           <Check className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />

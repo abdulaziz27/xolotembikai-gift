@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Source_Code_Pro } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
+import { AuthProvider } from "@/components/providers/auth-provider";
+import ConditionalFooter from "@/components/layout/conditional-footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const sourceCodePro = Source_Code_Pro({
+  variable: "--font-source-code-pro",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Givva - Experience Gifts Platform",
-  description: "Don&apos;t give boring gifts. Give unforgettable experiences that create lasting memories.",
+  title: "Xolotembikai Gift - Experience Gifts Platform",
+  description: "Don't give boring gifts. Give unforgettable experiences that create lasting memories.",
 };
 
 export default function RootLayout({
@@ -27,11 +28,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
+        className={`${inter.variable} ${sourceCodePro.variable} antialiased min-h-screen font-sans`}
       >
-        <Header />
-        {children}
-        <Footer />
+        <AuthProvider>
+          <Header />
+          {children}
+          <ConditionalFooter />
+        </AuthProvider>
       </body>
     </html>
   );

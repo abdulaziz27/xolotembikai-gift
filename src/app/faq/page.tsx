@@ -26,7 +26,7 @@ export default function FAQPage() {
         },
         {
           question: "How do I reset my password?",
-          answer: "Click &apos;Forgot Password&apos; on the login page, enter your email address, and we&apos;ll send you a reset link. Check your email (including spam folder) and follow the instructions to create a new password."
+          answer: "Click 'Forgot Password' on the login page, enter your email address, and we'll send you a reset link. Check your email (including spam folder) and follow the instructions to create a new password."
         }
       ]
     },
@@ -45,7 +45,7 @@ export default function FAQPage() {
         },
         {
           question: "What happens if I need to cancel last minute?",
-          answer: "Last-minute cancellations (within 24 hours) may be subject to cancellation fees depending on the experience provider&apos;s policy. We recommend rescheduling when possible. Emergency cancellations due to illness or unforeseen circumstances are handled case-by-case."
+          answer: "Last-minute cancellations (within 24 hours) may be subject to cancellation fees depending on the experience provider's policy. We recommend rescheduling when possible. Emergency cancellations due to illness or unforeseen circumstances are handled case-by-case."
         },
         {
           question: "Can I reschedule instead of canceling?",

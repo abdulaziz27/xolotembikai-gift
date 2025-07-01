@@ -89,7 +89,7 @@ export default function BlogDetailPage() {
           </h2>
 
           <p className="text-gray-700 leading-relaxed mb-6">
-            AI-powered design tools are no longer just concept generators—they&apos;re comprehensive 
+            AI-powered design tools are no longer just concept generators—they're comprehensive 
             solutions that can handle everything from layout optimization to color palette selection. 
             These tools learn from millions of design patterns to suggest the most effective solutions 
             for your specific needs.
@@ -112,7 +112,7 @@ export default function BlogDetailPage() {
           </p>
 
           <p className="text-gray-700 leading-relaxed mb-8">
-            The integration of AI in web design isn&apos;t about replacing human creativity—it&apos;s about 
+            The integration of AI in web design isn't about replacing human creativity—it's about 
             amplifying it. Designers can now iterate faster, explore more possibilities, and deliver 
             better results in less time.
           </p>

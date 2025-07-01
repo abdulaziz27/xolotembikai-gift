@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
             Reset your password
           </h2>
           <p className="text-gray-600">
-            Don&apos;t worry, we&apos;ll help you get back to{' '}
+            Don't worry, we'll help you get back to{' '}
             <span className="bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent font-semibold">
               Givva
             </span>

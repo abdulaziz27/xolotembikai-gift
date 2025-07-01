@@ -174,7 +174,7 @@ export default function TermsPage() {
                   <section>
                     <h3 className="text-2xl font-bold text-gray-900 mb-6">Acceptance of Terms</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      By accessing and using Givva&apos;s platform, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+                      By accessing and using Givva's platform, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
                     </p>
                   </section>
 
@@ -182,7 +182,7 @@ export default function TermsPage() {
                   <section>
                     <h3 className="text-2xl font-bold text-gray-900 mb-6">Use License</h3>
                     <p className="text-gray-700 leading-relaxed mb-4">
-                      Permission is granted to temporarily access Givva&apos;s platform for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
+                      Permission is granted to temporarily access Givva's platform for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
                     </p>
                     <ul className="space-y-3 text-gray-700">
                       <li className="flex items-start">
@@ -250,7 +250,7 @@ export default function TermsPage() {
                   <section>
                     <h3 className="text-2xl font-bold text-gray-900 mb-6">Disclaimer</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      The information on this platform is provided on an &apos;as is&apos; basis. To the fullest extent permitted by law, Givva excludes all representations, warranties, conditions and terms relating to our platform and the use of this platform.
+                      The information on this platform is provided on an 'as is' basis. To the fullest extent permitted by law, Givva excludes all representations, warranties, conditions and terms relating to our platform and the use of this platform.
                     </p>
                   </section>
 

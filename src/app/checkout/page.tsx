@@ -23,11 +23,29 @@ export default function CheckoutPage() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleCompletePayment = () => {
-    // Simulate payment processing
-    setTimeout(() => {
-      router.push('/checkout/success')
-    }, 1000)
+  const handleCompletePayment = async () => {
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName
+        })
+      })
+      const data = await res.json()
+      if (!data.success) {
+        alert('Checkout failed: ' + (data.error || 'Unknown error'))
+        return
+      }
+      // Simulate payment processing
+      setTimeout(() => {
+        router.push('/checkout/success')
+      }, 1000)
+    } catch (err) {
+      alert('Checkout error: ' + err)
+    }
   }
 
   return (
@@ -98,7 +116,7 @@ export default function CheckoutPage() {
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
-                  <p className="text-sm text-gray-500 mt-1">We&apos;ll send your confirmation here</p>
+                  <p className="text-sm text-gray-500 mt-1">We'll send your confirmation here</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

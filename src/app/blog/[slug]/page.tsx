@@ -99,13 +99,13 @@ export default function BlogDetailPage() {
         {/* Article Content */}
         <div className="prose prose-lg max-w-none">
           <p className="text-gray-700 leading-relaxed mb-6">
-            We&apos;ve already written a blog about why encouraging our team to refer their friends and 
+            We've already written a blog about why encouraging our team to refer their friends and 
             colleagues works so well for us. It&apos;s <a href="#" className="text-blue-600 underline">here</a> if you want to read it.
           </p>
 
           <p className="text-gray-700 leading-relaxed mb-8">
             But, to really drive the point home—and hear a little more from our lovely team about 
-            what drew them to GetYourGuide in the first place—we thought we&apos;d write another one.
+            what drew them to GetYourGuide in the first place—we thought we'd write another one.
           </p>
 
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
@@ -125,13 +125,13 @@ export default function BlogDetailPage() {
           <p className="text-gray-700 leading-relaxed mb-6">
             Secondly, referred employees are more likely to stick around because they understand the 
             company culture from the start. When our employees feel confident enough to recommend 
-            us to their friends and ex-co-workers, it&apos;s a testament to the vibrant and welcoming 
+            us to their friends and ex-co-workers, it's a testament to the vibrant and welcoming 
             environment we work hard to maintain.
           </p>
 
           <p className="text-gray-700 leading-relaxed mb-8">
-            Lastly, giving our employees a say in the company&apos;s structure builds collaboration, 
-            community, and personal investment. That&apos;s why we offer cash bonuses for every successful 
+            Lastly, giving our employees a say in the company's structure builds collaboration, 
+            community, and personal investment. That's why we offer cash bonuses for every successful 
             referral, incentivizing our team to invite those they trust into the fold.
           </p>
 
@@ -189,7 +189,7 @@ export default function BlogDetailPage() {
                   </div>
                 </div>
                 <h4 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors mb-2">
-                  How to start a blog in 10 steps: a beginner&apos;s guide
+                  How to start a blog in 10 steps: a beginner's guide
                 </h4>
                 <p className="text-sm text-gray-600">
                   Learn the complete process of starting your own blog from scratch with this comprehensive guide.

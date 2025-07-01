@@ -1,7 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { ChevronDown, Star, Gift, ShoppingBag, Filter, X } from 'lucide-react'
+import { Experience, FilterOptions } from '@/types/experiences'
+import { experienceService, experienceUtils } from '@/lib/services/experiences'
 
 interface FilterState {
   priceRange: string[]
@@ -12,7 +15,15 @@ interface FilterState {
 }
 
 export default function ExperiencesPage() {
-  const [sortBy, setSortBy] = useState('Most Popular')
+  const [experiences, setExperiences] = useState<Experience[]>([])
+  const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  
+  const [sortBy, setSortBy] = useState('featured')
   const [selectedFilters, setSelectedFilters] = useState<FilterState>({
     priceRange: [],
     occasion: [],
@@ -21,137 +32,100 @@ export default function ExperiencesPage() {
     giftType: []
   })
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
+  
+  const router = useRouter()
 
-  // Debug log for filters (can be removed in production)
-  console.log('Current filters:', selectedFilters)
+  // Fetch experiences and filter options
+  const fetchExperiences = async (loadMore = false) => {
+    try {
+      if (!loadMore) {
+        setLoading(true)
+      } else {
+        setLoadingMore(true)
+      }
 
-  const priceRanges = [
-    { label: 'Under $100', count: 306 },
-    { label: '$100 - $200', count: 98 },
-    { label: '$200 - $300', count: 78 },
-    { label: '$300 - $400', count: 45 },
-    { label: '$500+', count: 13 }
-  ]
+      const page = loadMore ? currentPage + 1 : 1
+      
+      // Convert filters to API params
+      const priceRangeFilter = selectedFilters.priceRange[0]
+      let priceMin, priceMax
+      if (priceRangeFilter) {
+        if (priceRangeFilter === 'Under $100') {
+          priceMax = 99
+        } else if (priceRangeFilter === '$100 - $200') {
+          priceMin = 100
+          priceMax = 200
+        } else if (priceRangeFilter === '$200 - $300') {
+          priceMin = 200
+          priceMax = 300
+        } else if (priceRangeFilter === '$300 - $400') {
+          priceMin = 300
+          priceMax = 400
+        } else if (priceRangeFilter === '$500+') {
+          priceMin = 500
+        }
+      }
 
-  const occasions = [
-    { label: 'Birthday', count: 245 },
-    { label: 'Anniversary', count: 89 },
-    { label: 'Graduation', count: 67 },
-    { label: 'Holiday', count: 189 },
-    { label: 'Thank You', count: 123 },
-    { label: 'Just Because', count: 156 }
-  ]
+      const response = await experienceService.getFrontendExperiences({
+        page,
+        limit: 12,
+        occasions: selectedFilters.occasion,
+        priceMin,
+        priceMax,
+        sortBy: sortBy === 'Most Popular' ? 'featured' : 
+               sortBy === 'Price: Low to High' ? 'price_low' :
+               sortBy === 'Price: High to Low' ? 'price_high' :
+               sortBy === 'Highest Rated' ? 'rating' :
+               sortBy === 'Newest' ? 'newest' : 'featured'
+      })
 
-  const perfectFor = [
-    { label: 'For Her', count: 189 },
-    { label: 'For Him', count: 167 },
-    { label: 'For Kids', count: 98 },
-    { label: 'For Teens', count: 76 },
-    { label: 'For Couples', count: 54 }
-  ]
-
-  const interests = [
-    { label: 'Food & Dining', count: 234 },
-    { label: 'Wellness & Spa', count: 145 },
-    { label: 'Adventure & Sports', count: 87 },
-    { label: 'Arts & Culture', count: 92 },
-    { label: 'Tech & Gaming', count: 78 },
-    { label: 'Fashion & Beauty', count: 156 }
-  ]
-
-  const giftTypes = [
-    { label: 'General Gift Card', count: 267 },
-    { label: 'Custom Experience', count: 210 }
-  ]
-
-  const experiences = [
-    {
-      id: 1,
-      title: 'Spa Day Experience Package',
-      provider: 'Serenity Wellness',
-      price: 150,
-      originalPrice: 200,
-      rating: 4.9,
-      reviews: 234,
-      categories: ['Wellness', 'Relaxation'],
-      badge: 'Popular',
-      badgeColor: 'bg-purple-500',
-      image: 'spa-experience'
-    },
-    {
-      id: 2,
-      title: 'Fine Dining Restaurant Card',
-      provider: 'Culinary Delights',
-      price: 100,
-      originalPrice: null,
-      rating: 4.8,
-      reviews: 189,
-      categories: ['Food', 'Dining'],
-      badge: '25% OFF',
-      badgeColor: 'bg-green-500',
-      image: 'dining-card'
-    },
-    {
-      id: 3,
-      title: 'Adventure Sports Package',
-      provider: 'Thrill Seekers',
-      price: 250,
-      originalPrice: 300,
-      rating: 4.7,
-      reviews: 156,
-      categories: ['Adventure', 'Sports'],
-      badge: '17% OFF',
-      badgeColor: 'bg-green-500',
-      image: 'adventure-sports'
-    },
-    {
-      id: 4,
-      title: 'Tech Store Gift Card',
-      provider: 'Digital World',
-      price: 75,
-      originalPrice: null,
-      rating: 4.9,
-      reviews: 312,
-      categories: ['Technology', 'Gadgets'],
-      badge: 'Popular',
-      badgeColor: 'bg-purple-500',
-      image: 'tech-card'
-    },
-    {
-      id: 5,
-      title: 'Art & Culture Experience',
-      provider: 'Creative Spaces',
-      price: 125,
-      originalPrice: null,
-      rating: 4.6,
-      reviews: 98,
-      categories: ['Arts', 'Culture'],
-      badge: 'Trending',
-      badgeColor: 'bg-orange-500',
-      image: 'art-culture'
-    },
-    {
-      id: 6,
-      title: 'Fashion Boutique Card',
-      provider: 'Style Central',
-      price: 200,
-      originalPrice: 250,
-      rating: 4.5,
-      reviews: 267,
-      categories: ['Fashion', 'Style'],
-      badge: '20% OFF',
-      badgeColor: 'bg-green-500',
-      image: 'fashion-card'
+      if (loadMore) {
+        setExperiences(prev => [...prev, ...response.experiences])
+        setCurrentPage(page)
+      } else {
+        setExperiences(response.experiences)
+        setCurrentPage(1)
+      }
+      
+      setTotalCount(response.total)
+      setHasMore(response.hasMore)
+    } catch (error) {
+      console.error('Error fetching experiences:', error)
+    } finally {
+      setLoading(false)
+      setLoadingMore(false)
     }
-  ]
+  }
+
+  const fetchFilterOptions = async () => {
+    try {
+      const options = await experienceService.getFilterOptions()
+      setFilterOptions(options)
+    } catch (error) {
+      console.error('Error fetching filter options:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchFilterOptions()
+  }, [])
+
+  useEffect(() => {
+    fetchExperiences()
+  }, [selectedFilters, sortBy])
 
   const handleFilterChange = (category: keyof FilterState, value: string) => {
-    setSelectedFilters(prev => ({
-      ...prev,
-      [category]: prev[category].includes(value) 
-        ? prev[category].filter(item => item !== value)
-        : [...prev[category], value]
-    }))
+    setSelectedFilters(prev => {
+      const currentValues = prev[category]
+      const newValues = currentValues.includes(value) 
+        ? currentValues.filter(item => item !== value)
+        : [...currentValues, value]
+      
+      return {
+        ...prev,
+        [category]: newValues
+      }
+    })
   }
 
   return (
@@ -180,11 +154,12 @@ export default function ExperiencesPage() {
                 <h3 className="text-lg font-semibold text-gray-900">Price Range</h3>
               </div>
               <div className="space-y-3">
-                {priceRanges.map((range, index) => (
+                {filterOptions?.priceRanges.map((range, index) => (
                   <label key={index} className="flex items-center justify-between cursor-pointer">
                     <div className="flex items-center">
                       <input
                         type="checkbox"
+                        checked={selectedFilters.priceRange.includes(range.label)}
                         className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         onChange={() => handleFilterChange('priceRange', range.label)}
                       />
@@ -203,11 +178,12 @@ export default function ExperiencesPage() {
                 <h3 className="text-lg font-semibold text-gray-900">Occasion</h3>
               </div>
               <div className="space-y-3">
-                {occasions.map((occasion, index) => (
+                {filterOptions?.occasions.map((occasion, index) => (
                   <label key={index} className="flex items-center justify-between cursor-pointer">
                     <div className="flex items-center">
                       <input
                         type="checkbox"
+                        checked={selectedFilters.occasion.includes(occasion.label)}
                         className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         onChange={() => handleFilterChange('occasion', occasion.label)}
                       />
@@ -226,11 +202,12 @@ export default function ExperiencesPage() {
                 <h3 className="text-lg font-semibold text-gray-900">Perfect For</h3>
               </div>
               <div className="space-y-3">
-                {perfectFor.map((item, index) => (
+                {filterOptions?.perfectFor.map((item, index) => (
                   <label key={index} className="flex items-center justify-between cursor-pointer">
                     <div className="flex items-center">
                       <input
                         type="checkbox"
+                        checked={selectedFilters.perfectFor.includes(item.label)}
                         className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         onChange={() => handleFilterChange('perfectFor', item.label)}
                       />
@@ -249,11 +226,12 @@ export default function ExperiencesPage() {
                 <h3 className="text-lg font-semibold text-gray-900">Interests</h3>
               </div>
               <div className="space-y-3">
-                {interests.map((interest, index) => (
+                {filterOptions?.interests.map((interest, index) => (
                   <label key={index} className="flex items-center justify-between cursor-pointer">
                     <div className="flex items-center">
                       <input
                         type="checkbox"
+                        checked={selectedFilters.interests.includes(interest.label)}
                         className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         onChange={() => handleFilterChange('interests', interest.label)}
                       />
@@ -272,11 +250,12 @@ export default function ExperiencesPage() {
                 <h3 className="text-lg font-semibold text-gray-900">Gift Type</h3>
               </div>
               <div className="space-y-3">
-                {giftTypes.map((type, index) => (
+                {filterOptions?.giftTypes.map((type, index) => (
                   <label key={index} className="flex items-center justify-between cursor-pointer">
                     <div className="flex items-center">
                       <input
                         type="checkbox"
+                        checked={selectedFilters.giftType.includes(type.label)}
                         className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         onChange={() => handleFilterChange('giftType', type.label)}
                       />
@@ -435,7 +414,9 @@ export default function ExperiencesPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Perfect Gifts for You</h1>
-                <p className="text-gray-600">Showing 477 amazing gift options</p>
+                <p className="text-gray-600">
+                  {loading ? 'Loading...' : `Showing ${totalCount} amazing gift options`}
+                </p>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-gray-600 text-sm sm:text-base">Sort by:</span>
@@ -458,67 +439,123 @@ export default function ExperiencesPage() {
 
             {/* Experience Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-8">
-              {experiences.map((experience) => (
-                <div key={experience.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer" onClick={() => window.location.href = `/experiences/luxury-spa-day-experience`}>
-                  {/* Image */}
-                  <div className="relative h-40 sm:h-48 bg-gradient-to-br from-purple-100 to-orange-100">
-                    {/* Badge */}
-                    <div className={`absolute top-3 sm:top-4 left-3 sm:left-4 ${experience.badgeColor} text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium`}>
-                      {experience.badge}
-                    </div>
-                    {/* Placeholder for image */}
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Gift className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
+              {loading ? (
+                // Loading skeleton
+                Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse">
+                    <div className="h-40 sm:h-48 bg-gray-200" />
+                    <div className="p-4 sm:p-6">
+                      <div className="h-4 bg-gray-200 rounded mb-3" />
+                      <div className="h-6 bg-gray-200 rounded mb-2" />
+                      <div className="h-4 bg-gray-200 rounded mb-4 w-2/3" />
+                      <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   </div>
+                ))
+              ) : experiences.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  <Gift className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No experiences found</h3>
+                  <p className="text-gray-500">Try adjusting your filters to see more results.</p>
+                </div>
+              ) : (
+                experiences.map((experience) => {
+                  const hasDiscount = experience.price_options?.length > 0
+                  const discountPercentage = hasDiscount 
+                    ? experienceUtils.calculateDiscount(experience.price_options[0], experience.starting_price)
+                    : 0
 
-                  {/* Content */}
-                  <div className="p-4 sm:p-6">
-                    {/* Categories */}
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {experience.categories.map((category, index) => (
-                        <span key={index} className="bg-purple-100 text-purple-700 px-2 py-1 rounded-md text-xs font-medium">
-                          {category}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Title and Provider */}
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 line-clamp-2">{experience.title}</h3>
-                    <p className="text-gray-600 text-xs sm:text-sm mb-3">{experience.provider}</p>
-
-                    {/* Price and Rating */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xl sm:text-2xl font-bold text-gray-900">${experience.price}</span>
-                        {experience.originalPrice && (
-                          <span className="text-gray-400 line-through text-xs sm:text-sm">${experience.originalPrice}</span>
+                  return (
+                    <div 
+                      key={experience.id} 
+                      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer" 
+                      onClick={() => router.push(`/experiences/${experience.slug}`)}
+                    >
+                      {/* Image */}
+                      <div className="relative h-40 sm:h-48 bg-gradient-to-br from-purple-100 to-orange-100">
+                        {/* Badge */}
+                        {experience.is_featured && (
+                          <div className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-purple-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
+                            Popular
+                          </div>
+                        )}
+                        {discountPercentage > 0 && (
+                          <div className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-green-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
+                            {discountPercentage}% OFF
+                          </div>
+                        )}
+                        
+                        {/* Image or placeholder */}
+                        {experience.featured_image ? (
+                          <img 
+                            src={experience.featured_image} 
+                            alt={experience.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Gift className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
+                          </div>
                         )}
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current" />
-                        <span className="text-xs sm:text-sm font-medium text-gray-900">{experience.rating}</span>
-                        <span className="text-xs sm:text-sm text-gray-500">({experience.reviews})</span>
+
+                      {/* Content */}
+                      <div className="p-4 sm:p-6">
+                        {/* Category */}
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <span className={`px-2 py-1 rounded-md text-xs font-medium ${experienceUtils.getCategoryColor(experience.category)}`}>
+                            {experience.category}
+                          </span>
+                        </div>
+
+                        {/* Title and Provider */}
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 line-clamp-2">{experience.title}</h3>
+                        <p className="text-gray-600 text-xs sm:text-sm mb-3">{experience.vendor?.name || 'No Vendor'}</p>
+
+                        {/* Price and Rating */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xl sm:text-2xl font-bold text-gray-900">
+                              {experienceUtils.formatPrice(experience.starting_price, experience.currency)}
+                            </span>
+                            {hasDiscount && (
+                              <span className="text-gray-400 line-through text-xs sm:text-sm">
+                                {experienceUtils.formatPrice(experience.price_options[0], experience.currency)}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current" />
+                            <span className="text-xs sm:text-sm font-medium text-gray-900">
+                              {experienceUtils.formatRating(experience.rating)}
+                            </span>
+                            <span className="text-xs sm:text-sm text-gray-500">({experience.total_bookings})</span>
+                          </div>
+                        </div>
+
+                        {/* Action Button */}
+                        <button className="w-full bg-gradient-to-r from-purple-600 to-orange-500 text-white py-2 sm:py-3 rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105">
+                          {experienceUtils.getActionButtonText(experience.category)}
+                        </button>
                       </div>
                     </div>
-
-                    {/* Action Button */}
-                    <button className="w-full bg-gradient-to-r from-purple-600 to-orange-500 text-white py-2 sm:py-3 rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105">
-                      {experience.categories.includes('Technology') || experience.categories.includes('Food') || experience.categories.includes('Fashion') 
-                        ? 'Get Gift Card' 
-                        : 'Book Experience'}
-                    </button>
-                  </div>
-                </div>
-              ))}
+                  )
+                })
+              )}
             </div>
 
             {/* Load More Button */}
-            <div className="text-center">
-              <button className="bg-gradient-to-r from-purple-600 to-orange-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-sm sm:text-base font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105">
-                Load More Amazing Gifts
-              </button>
-            </div>
+            {hasMore && !loading && (
+              <div className="text-center">
+                <button 
+                  onClick={() => fetchExperiences(true)}
+                  disabled={loadingMore}
+                  className="bg-gradient-to-r from-purple-600 to-orange-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-sm sm:text-base font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50"
+                >
+                  {loadingMore ? 'Loading...' : 'Load More Amazing Gifts'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
