@@ -6,6 +6,7 @@ import { Star, MapPin, Phone, Heart, Share, Calendar, ChevronDown, ChevronUp, Ch
 import Image from 'next/image'
 import { Experience } from '@/types/experiences'
 import { experienceService, experienceUtils } from '@/lib/services/experiences'
+import Link from 'next/link'
 
 interface ExperienceDetailProps {
   params: Promise<{ slug: string }>
@@ -68,9 +69,9 @@ export default function ExperienceDetailPage({ params }: ExperienceDetailProps) 
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Experience Not Found</h1>
           <p className="text-gray-600 mb-4">{error || 'The experience you\'re looking for doesn\'t exist.'}</p>
-          <a href="/experiences" className="text-purple-600 hover:text-purple-800">
+          <Link href="/experiences" className="text-purple-600 hover:text-purple-800">
             ← Back to Experiences
-          </a>
+          </Link>
         </div>
       </div>
     )

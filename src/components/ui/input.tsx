@@ -1,6 +1,10 @@
 import * as React from "react"
 import { cn } from "@/lib/utils/table"
 
+/**
+ * InputProps extends the standard HTML input element props to maintain type safety
+ * while allowing for custom styling and behavior through className and other props.
+ */
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   // This interface can be extended with custom props in the future
