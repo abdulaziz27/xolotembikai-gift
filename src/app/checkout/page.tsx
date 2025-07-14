@@ -1,313 +1,212 @@
 'use client'
 
-import { useState } from 'react'
-import { ArrowLeft, Zap, Shield, CreditCard, Check } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
+import { CheckoutForm } from '@/components/checkout/checkout-form'
+import { ArrowLeft, Shield, User } from 'lucide-react'
 import Image from 'next/image'
+import { experienceService } from '@/lib/services/experiences'
+import { useAuth } from '@/components/providers/auth-provider'
+import type { Experience } from '@/types'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 
-export default function CheckoutPage() {
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+)
+
+function CheckoutFlow() {
   const router = useRouter()
-  const [formData, setFormData] = useState({
-    email: 'your@email.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    cardNumber: '1234 5678 9012 3456',
-    expiryDate: 'MM/YY',
-    cvv: '123',
-    address: '123 Main Street',
-    city: 'New York',
-    zipCode: '10001'
-  })
+  const searchParams = useSearchParams()
+  const { profile } = useAuth() // We still use auth to pre-fill info if logged in
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
+  const [experience, setExperience] = useState<Experience | null>(null)
+  const [customer, setCustomer] = useState({ name: '', email: '' })
+  const [clientSecret, setClientSecret] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  
+  const experienceId = searchParams.get('experienceId')
 
-  const handleCompletePayment = async () => {
+  // Pre-fill customer details if user is logged in
+  useEffect(() => {
+    if (profile) {
+      setCustomer({ name: profile.full_name || '', email: profile.email || '' })
+    }
+  }, [profile])
+
+  // Fetch experience details on page load
+  useEffect(() => {
+    if (!experienceId) {
+      router.push('/')
+      return;
+    }
+    const fetchExperience = async () => {
+      try {
+        setLoading(true)
+        const expData = await experienceService.getExperienceById(experienceId)
+        setExperience(expData)
+      } catch (err) {
+        setError('Could not load experience details.')
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchExperience()
+  }, [experienceId, router])
+
+  const handleCreatePaymentIntent = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!experience || !customer.email || !customer.name) {
+      setError('Please provide your name and email.');
+      return;
+    }
+    setError(null);
+    setLoading(true);
+
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName
-        })
+          experienceId: experience.id,
+          userId: profile?.id, // Optional: will be null for guests
+          email: customer.email,
+          name: customer.name,
+        }),
       })
       const data = await res.json()
-      if (!data.success) {
-        alert('Checkout failed: ' + (data.error || 'Unknown error'))
-        return
+      if (data.success) {
+        setClientSecret(data.clientSecret)
+      } else {
+        setError(data.error || 'Failed to initialize payment.')
       }
-      // Simulate payment processing
-      setTimeout(() => {
-        router.push('/checkout/success')
-      }, 1000)
     } catch (err) {
-      alert('Checkout error: ' + err)
+      setError('Could not connect to payment service.')
+    } finally {
+      setLoading(false)
     }
   }
 
+  if (!experience && loading) {
+     return (
+        <div className="w-full h-full flex items-center justify-center p-8">
+            <div className="text-center py-10">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+                <p className="mt-4 text-gray-600">Loading experience...</p>
+            </div>
+        </div>
+    )
+  }
+
+  if (error) {
+     return <div className="p-8 text-center text-red-500">{error}</div>
+  }
+  
+  if (!experience) {
+      return <div className="p-8 text-center">Experience not found.</div>;
+  }
+  
+  const appearance = { theme: 'stripe' as const, variables: { colorPrimary: '#7c3aed' } }
+  const options = { clientSecret, appearance }
+
   return (
-    <div className="min-h-screen bg-gray-50 pt-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center space-x-4 mb-2">
-            <button 
-              onClick={() => router.back()}
-              className="text-gray-600 hover:text-gray-900"
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </button>
+    <div className="flex flex-col md:flex-row bg-white rounded-2xl shadow-xl overflow-hidden">
+        {/* Left Side: Order Summary */}
+        <div className="w-full md:w-1/2 bg-gray-100 p-8">
+        <button
+            onClick={() => router.back()}
+            className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+        >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+        </button>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Order Summary</h2>
+        
+        <div className="bg-white rounded-lg p-4 flex items-center gap-4">
+            <Image 
+            src={experience.featured_image || '/placeholder.svg'}
+            alt={experience.title}
+            width={80}
+            height={80}
+            className="rounded-lg object-cover"
+            />
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Checkout</h1>
-              <p className="text-gray-600">Complete your purchase</p>
+            <h3 className="font-semibold text-gray-800">{experience.title}</h3>
+            <p className="text-sm text-gray-500">by {experience.vendor?.name || 'In-house'}</p>
+            <p className="text-lg font-bold text-purple-600 mt-1">
+                {new Intl.NumberFormat('en-US', { style: 'currency', currency: experience.currency || 'MYR' }).format(experience.starting_price)}
+            </p>
             </div>
-          </div>
         </div>
 
-        {/* Alert Banner */}
-        <div className="mb-8">
-          <div className="bg-purple-50 border border-purple-200 rounded-2xl p-4 sm:p-6">
-            <div className="flex items-start space-x-3">
-              <div className="bg-gradient-to-r from-purple-500 to-orange-500 rounded-lg p-2">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-2">
-                  <span className="text-orange-500">🔥</span>
-                  <h3 className="font-bold text-gray-900">Checkout Now - Gift Arrives Instantly via Email, Text or WhatsApp!</h3>
-                </div>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-orange-500">⏰</span>
-                    <span>High demand - book today</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-purple-500">🎁</span>
-                    <span>Premium experience awaits</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Instant confirmation</span>
-                  </div>
-                </div>
-              </div>
+        <div className="mt-8 pt-6 border-t border-gray-200">
+            <div className="flex justify-between text-gray-600">
+                <span>Subtotal</span>
+                <span>{new Intl.NumberFormat('en-US', { style: 'currency', currency: experience.currency || 'MYR' }).format(experience.starting_price)}</span>
             </div>
-          </div>
+                <div className="flex justify-between text-gray-600 mt-2">
+                <span>Taxes & Fees</span>
+                <span>Calculated at next step</span>
+            </div>
+            <div className="flex justify-between text-xl font-bold text-gray-900 mt-4">
+                <span>Total</span>
+                <span>{new Intl.NumberFormat('en-US', { style: 'currency', currency: experience.currency || 'MYR' }).format(experience.starting_price)}</span>
+            </div>
+        </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column - Contact & Payment Info */}
-          <div className="space-y-8">
-            {/* Contact Information */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Contact Information</h2>
-              
-              <div className="space-y-4">
+        {/* Right Side: Customer Info & Payment */}
+        <div className="w-full md:w-1/2 p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Details</h2>
+            
+            {!clientSecret ? (
+              <form onSubmit={handleCreatePaymentIntent} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">We'll send your confirmation here</p>
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input id="name" type="text" value={customer.name} onChange={(e) => setCustomer({...customer, name: e.target.value})} placeholder="John Doe" required />
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
+                 <div>
+                    <Label htmlFor="email">Email Address</Label>
+                    <Input id="email" type="email" value={customer.email} onChange={(e) => setCustomer({...customer, email: e.target.value})} placeholder="you@example.com" required />
                 </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? 'Processing...' : 'Proceed to Payment'}
+                </Button>
+              </form>
+            ) : (
+              <div>
+                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-500">Paying as:</p>
+                    <p className="font-semibold text-gray-800">{customer.name} ({customer.email})</p>
+                </div>
+                <Elements options={options} stripe={stripePromise}>
+                    <CheckoutForm />
+                </Elements>
               </div>
+            )}
+
+            <div className="mt-6 flex items-center text-gray-500 text-sm">
+                <Shield className="w-4 h-4 mr-2 text-green-500" />
+                <span>Secure payment powered by Stripe.</span>
             </div>
-
-            {/* Payment Information */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <div className="flex items-center space-x-3 mb-6">
-                <CreditCard className="w-6 h-6 text-gray-600" />
-                <h2 className="text-xl font-bold text-gray-900">Payment Information</h2>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Card Number
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.cardNumber}
-                    onChange={(e) => handleInputChange('cardNumber', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="1234 5678 9012 3456"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Expiry Date
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.expiryDate}
-                      onChange={(e) => handleInputChange('expiryDate', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="MM/YY"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      CVV
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.cvv}
-                      onChange={(e) => handleInputChange('cvv', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="123"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Billing Address */}
-              <div className="mt-8">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Billing Address</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Address
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.address}
-                      onChange={(e) => handleInputChange('address', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="123 Main Street"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        City
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.city}
-                        onChange={(e) => handleInputChange('city', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="New York"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        ZIP Code
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.zipCode}
-                        onChange={(e) => handleInputChange('zipCode', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="10001"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Order Summary */}
-          <div className="lg:sticky lg:top-24 lg:h-fit">
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
-              
-              {/* Experience Item */}
-              <div className="flex items-start space-x-4 mb-6">
-                <Image 
-                  src="https://via.placeholder.com/80x80/A855F7/FFFFFF?text=Spa"
-                  alt="Luxury Spa Day Experience"
-                  width={80}
-                  height={80}
-                  className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl"
-                />
-                <div className="flex-1">
-                  <h3 className="font-bold text-gray-900 mb-1">Luxury Spa Day Experience</h3>
-                  <p className="text-sm text-gray-600 mb-2">Wellness & Spa</p>
-                  <div className="bg-green-100 text-green-700 px-2 py-1 rounded-md text-xs font-medium inline-block">
-                    Valid 12 months
-                  </div>
-                </div>
-              </div>
-
-              {/* Price Breakdown */}
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-gray-900">
-                  <span>Subtotal</span>
-                  <span>$299</span>
-                </div>
-                <div className="flex justify-between text-green-600">
-                  <span>Discount</span>
-                  <span>-$100</span>
-                </div>
-                <div className="flex justify-between text-gray-900">
-                  <span>Processing Fee</span>
-                  <span>$0</span>
-                </div>
-                <hr className="border-gray-200" />
-                <div className="flex justify-between text-lg font-bold text-gray-900">
-                  <span>Total</span>
-                  <span>$299</span>
-                </div>
-              </div>
-
-              {/* Complete Purchase Button */}
-              <button
-                onClick={handleCompletePayment}
-                className="w-full bg-gradient-to-r from-purple-600 to-orange-500 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 mb-4"
-              >
-                <Shield className="w-5 h-5" />
-                <span>Complete Purchase - $299</span>
-              </button>
-
-              {/* Security Note */}
-              <div className="text-center">
-                <div className="flex items-center justify-center space-x-2 text-sm text-gray-500 mb-2">
-                  <Shield className="w-4 h-4" />
-                  <span>256-bit SSL encrypted</span>
-                </div>
-                <p className="text-xs text-gray-500">Your payment information is secure and protected</p>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
   )
+}
+
+export default function CheckoutPage() {
+    return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+            <div className="w-full max-w-4xl mx-auto">
+                <Suspense fallback={<div>Loading Checkout...</div>}>
+                    <CheckoutFlow />
+                </Suspense>
+            </div>
+        </div>
+    )
 } 

@@ -7,12 +7,14 @@ import Image from 'next/image'
 import { Experience } from '@/types/experiences'
 import { experienceService, experienceUtils } from '@/lib/services/experiences'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface ExperienceDetailProps {
   params: Promise<{ slug: string }>
 }
 
 function ExperienceDetailContent({ params }: ExperienceDetailProps) {
+  const router = useRouter() // Moved hook to the top level
   const [experienceData, setExperienceData] = useState<Experience | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -826,15 +828,10 @@ function ExperienceDetailContent({ params }: ExperienceDetailProps) {
                   {/* Action Buttons */}
                   <div className="space-y-4">
                     <button 
-                      onClick={() => window.location.href = '/checkout'}
-                      className="w-full bg-gradient-to-r from-purple-600 to-orange-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2">
-                      <Gift className="w-5 h-5" />
-                      <span>
-                        {experienceType === 'gift-card' 
-                          ? (giftOption === 'gift-someone' ? 'Buy Gift Card' : 'Buy Gift Card')
-                          : (giftOption === 'gift-someone' ? 'Send as Gift' : 'Book Now')
-                        }
-                      </span>
+                      onClick={() => router.push(`/checkout?experienceId=${experienceData.id}`)}
+                      className="w-full bg-gradient-to-r from-purple-600 to-orange-500 text-white font-bold py-4 rounded-xl text-lg hover:shadow-lg transition-all"
+                    >
+                        {experienceType === 'gift-card' ? 'Buy Gift Card' : 'Book Now'} - {experienceUtils.formatPrice(currentPrice, currentCurrency.symbol)}
                     </button>
                     
                     <div className="flex space-x-2">

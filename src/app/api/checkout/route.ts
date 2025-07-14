@@ -1,128 +1,79 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { Resend } from 'resend'
+import Stripe from 'stripe'
+import { createClient } from '@/lib/supabase/server'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-)
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('STRIPE_SECRET_KEY is not set in environment variables')
+}
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Initialize Stripe with the secret key
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  typescript: true,
+})
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email, firstName, lastName } = body
+    const { experienceId, userId, email, name } = await request.json() // userId can be null
 
-    if (!email || !firstName) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Email and first name are required' 
-      }, { status: 400 })
+    if (!experienceId || !email || !name) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required information: experience, email, and name.' },
+        { status: 400 }
+      )
+    }
+    
+    const supabase = await createClient()
+
+    // Securely fetch the experience from the database to get the real price
+    const { data: experience, error: experienceError } = await supabase
+      .from('experiences')
+      .select('starting_price, currency, title')
+      .eq('id', experienceId)
+      .single()
+
+    if (experienceError || !experience) {
+      console.error('Error fetching experience:', experienceError)
+      return NextResponse.json(
+        { success: false, error: 'Experience not found or could not be fetched.' },
+        { status: 404 }
+      )
     }
 
-    // Cek apakah user sudah ada
-    const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers()
-    const userExists = existingUser.users?.find(user => user.email === email)
+    const { starting_price: amount, currency, title } = experience
 
-    let user = userExists
-
-    if (!userExists) {
-      // Buat user baru tanpa password (guest auto-register)
-      const { data: newUserData, error: createError } = await supabaseAdmin.auth.admin.createUser({
-        email,
-        email_confirm: true, // ✅ Force auto-confirm untuk guest checkout
-        user_metadata: { 
-          full_name: firstName + (lastName ? ' ' + lastName : ''),
-          created_via: 'guest_checkout',
-          needs_password_setup: true
-        }
-      })
-
-      if (createError) {
-        console.error('Error creating user:', createError)
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Failed to create account' 
-        }, { status: 500 })
-      }
-
-      user = newUserData.user
+    if (!amount || amount <= 0) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid price for the experience' },
+        { status: 400 }
+      )
     }
 
-    // Generate password setup link
-    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'recovery',
-      email,
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/setup-password`
-      }
+    // Create a PaymentIntent with the secure amount and currency from the database
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Stripe expects amount in cents
+      currency: currency || 'myr',
+      receipt_email: email,
+      metadata: {
+        experienceId,
+        userId: userId || 'guest', // Store 'guest' if userId is not provided
+        customerName: name,
+        customerEmail: email,
+      },
+      description: `Purchase of "${title}" by ${name || email}`,
     })
 
-    if (linkError) {
-      console.error('Error generating link:', linkError)
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Failed to generate setup link' 
-      }, { status: 500 })
-    }
-
-    // Kirim welcome email dengan password setup
-    try {
-      await resend.emails.send({
-        from: 'Xolotembikai Gift <noreply@xolotembikai.com>',
-        to: [email],
-        subject: 'Welcome! Setup Your Account Password',
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #7c3aed;">Welcome to Xolotembikai Gift, ${firstName}!</h1>
-            
-            <p>Thank you for your purchase! Your gift has been processed successfully.</p>
-            
-            <p>We've created an account for you so you can:</p>
-            <ul>
-              <li>Track your orders</li>
-              <li>View purchase history</li>
-              <li>Manage your gifts</li>
-            </ul>
-            
-            <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h3 style="margin-top: 0;">Setup Your Password</h3>
-              <p>Click the button below to set your password and access your account:</p>
-              <a href="${linkData.properties.action_link}" 
-                 style="display: inline-block; background: linear-gradient(to right, #7c3aed, #f97316); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-                Setup Password
-              </a>
-            </div>
-            
-            <p>If you have any questions, feel free to contact us.</p>
-            
-            <p>Best regards,<br>The Xolotembikai Gift Team</p>
-          </div>
-        `
-      })
-    } catch (emailError) {
-      console.error('Error sending welcome email:', emailError)
-      // Don't fail the checkout if email fails
-    }
-
-    return NextResponse.json({ 
-      success: true, 
-      message: userExists ? 'Welcome back! Order processed.' : 'Account created! Check your email to setup password.',
-      user_created: !userExists
+    // Send the client_secret back to the client
+    return NextResponse.json({
+      success: true,
+      clientSecret: paymentIntent.client_secret,
     })
-
-  } catch (err) {
-    console.error('Checkout error:', err)
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Internal server error' 
-    }, { status: 500 })
+  } catch (error) {
+    console.error('Stripe API Error:', error)
+    const errorMessage =
+      error instanceof Error ? error.message : 'Internal server error'
+    return NextResponse.json(
+      { success: false, error: errorMessage },
+      { status: 500 }
+    )
   }
 } 

@@ -540,7 +540,13 @@ export default function ExperiencesPage() {
                         </div>
 
                         {/* Action Button */}
-                        <button className="w-full bg-gradient-to-r from-purple-600 to-orange-500 text-white py-2 sm:py-3 rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent card click from firing
+                            router.push(`/checkout?experienceId=${experience.id}`)
+                          }}
+                          className="w-full bg-gradient-to-r from-purple-600 to-orange-500 text-white py-2 sm:py-3 rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                        >
                           {experienceUtils.getActionButtonText(experience.category)}
                         </button>
                       </div>
