@@ -1,84 +1,87 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { ColumnDef } from "@tanstack/react-table"
-import { Eye, Edit3, Package, CreditCard, User, Calendar } from "lucide-react"
+import { useRouter } from "next/navigation";
+import { ColumnDef } from "@tanstack/react-table";
+import { Eye, Edit3, Package, CreditCard, User, Calendar } from "lucide-react";
 
-import { DataTable } from "@/components/ui/data-table"
-import { ActionButton, StatusBadge } from "@/components/ui/data-table"
-import type { Order } from "@/types/orders"
+import { DataTable } from "@/components/ui/data-table";
+import { ActionButton, StatusBadge } from "@/components/ui/data-table";
+import type { SimpleOrder } from "@/types/orders";
 
 interface OrdersTableProps {
-  data: Order[]
-  loading?: boolean
-  onRefresh?: () => void
+  data: SimpleOrder[];
+  loading?: boolean;
+  onRefresh?: () => void;
 }
 
 export function OrdersTable({ data, loading, onRefresh }: OrdersTableProps) {
-  const router = useRouter()
+  const router = useRouter();
 
-  const handleView = (order: Order) => {
-    router.push(`/admin/orders/${order.id}`)
-  }
+  const handleView = (order: SimpleOrder) => {
+    router.push(`/admin/orders/${order.id}`);
+  };
 
-  const handleEdit = (order: Order) => {
-    router.push(`/admin/orders/${order.id}/edit`)
-  }
+  const handleEdit = (order: SimpleOrder) => {
+    router.push(`/admin/orders/${order.id}/edit`);
+  };
 
-  const handleFulfill = async (order: Order) => {
+  const handleFulfill = async (order: SimpleOrder) => {
     if (window.confirm(`Mark order "${order.order_number}" as fulfilled?`)) {
       try {
         const response = await fetch(`/api/orders/${order.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: 'completed' })
-        })
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "completed" }),
+        });
         if (response.ok) {
-          onRefresh?.()
+          onRefresh?.();
         }
       } catch (error) {
-        console.error('Failed to fulfill order:', error)
+        console.error("Failed to fulfill order:", error);
       }
     }
-  }
+  };
 
-  const handleRefund = async (order: Order) => {
+  const handleRefund = async (order: SimpleOrder) => {
     if (window.confirm(`Process refund for order "${order.order_number}"?`)) {
       try {
         const response = await fetch(`/api/orders/${order.id}/refund`, {
-          method: 'POST'
-        })
+          method: "POST",
+        });
         if (response.ok) {
-          onRefresh?.()
+          onRefresh?.();
         }
       } catch (error) {
-        console.error('Failed to process refund:', error)
+        console.error("Failed to process refund:", error);
       }
     }
-  }
+  };
 
   const getStatusVariant = (status: string) => {
-    const statusMap: Record<string, "pending" | "completed" | "cancelled" | "processing"> = {
-      'pending': 'pending',
-      'confirmed': 'processing',
-      'completed': 'completed',
-      'cancelled': 'cancelled',
-      'refunded': 'cancelled'
-    }
-    return statusMap[status] || 'pending'
-  }
+    const statusMap: Record<
+      string,
+      "pending" | "completed" | "cancelled" | "processing"
+    > = {
+      pending: "pending",
+      confirmed: "processing",
+      completed: "completed",
+      cancelled: "cancelled",
+      refunded: "cancelled",
+    };
+    return statusMap[status] || "pending";
+  };
 
   const getPaymentStatusVariant = (status: string) => {
     const statusMap: Record<string, "pending" | "completed" | "failed"> = {
-      'pending': 'pending',
-      'paid': 'completed',
-      'failed': 'failed',
-      'refunded': 'failed'
-    }
-    return statusMap[status] || 'pending'
-  }
+      pending: "pending",
+      paid: "completed",
+      failed: "failed",
+      refunded: "failed",
+    };
+    return statusMap[status] || "pending";
+  };
 
-  const columns: ColumnDef<Order>[] = [
+  const columns: ColumnDef<SimpleOrder>[] = [
     {
       accessorKey: "order_number",
       header: "Order",
@@ -118,7 +121,8 @@ export function OrdersTable({ data, loading, onRefresh }: OrdersTableProps) {
             {getValue() as string}
           </div>
           <div className="text-sm text-gray-500 mt-1">
-            {row.original.participants} participant{row.original.participants !== 1 ? 's' : ''}
+            {row.original.participants} participant
+            {row.original.participants !== 1 ? "s" : ""}
           </div>
         </div>
       ),
@@ -136,19 +140,19 @@ export function OrdersTable({ data, loading, onRefresh }: OrdersTableProps) {
       accessorKey: "status",
       header: "Order Status",
       cell: ({ getValue }) => {
-        const status = getValue() as string
+        const status = getValue() as string;
         return (
           <StatusBadge status={getStatusVariant(status)}>
             {status.charAt(0).toUpperCase() + status.slice(1)}
           </StatusBadge>
-        )
+        );
       },
     },
     {
       accessorKey: "payment_status",
       header: "Payment",
       cell: ({ getValue }) => {
-        const status = getValue() as string
+        const status = getValue() as string;
         return (
           <div className="flex items-center">
             <CreditCard className="w-3 h-3 mr-1 text-gray-400" />
@@ -156,19 +160,19 @@ export function OrdersTable({ data, loading, onRefresh }: OrdersTableProps) {
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </StatusBadge>
           </div>
-        )
+        );
       },
     },
     {
       accessorKey: "experience_date",
       header: "Exp. Date",
       cell: ({ getValue }) => {
-        const date = getValue() as string
+        const date = getValue() as string;
         return (
           <div className="text-sm text-gray-600">
-            {date ? new Date(date).toLocaleDateString() : 'TBD'}
+            {date ? new Date(date).toLocaleDateString() : "TBD"}
           </div>
-        )
+        );
       },
     },
     {
@@ -188,7 +192,8 @@ export function OrdersTable({ data, loading, onRefresh }: OrdersTableProps) {
             tooltip="Edit Order"
             onClick={() => handleEdit(row.original)}
           />
-          {(row.original.status === 'pending' || row.original.status === 'confirmed') && (
+          {(row.original.status === "pending" ||
+            row.original.status === "confirmed") && (
             <ActionButton
               variant="primary"
               icon={<Package className="w-4 h-4" />}
@@ -196,18 +201,19 @@ export function OrdersTable({ data, loading, onRefresh }: OrdersTableProps) {
               onClick={() => handleFulfill(row.original)}
             />
           )}
-          {row.original.payment_status === 'paid' && row.original.status !== 'refunded' && (
-            <ActionButton
-              variant="secondary"
-              icon={<CreditCard className="w-4 h-4" />}
-              tooltip="Process Refund"
-              onClick={() => handleRefund(row.original)}
-            />
-          )}
+          {row.original.payment_status === "paid" &&
+            row.original.status !== "refunded" && (
+              <ActionButton
+                variant="secondary"
+                icon={<CreditCard className="w-4 h-4" />}
+                tooltip="Process Refund"
+                onClick={() => handleRefund(row.original)}
+              />
+            )}
         </div>
       ),
     },
-  ]
+  ];
 
   const bulkActions = [
     {
@@ -222,7 +228,7 @@ export function OrdersTable({ data, loading, onRefresh }: OrdersTableProps) {
       icon: <Package className="w-4 h-4 mr-2" />,
       variant: "default" as const,
     },
-  ]
+  ];
 
   return (
     <DataTable
@@ -235,7 +241,7 @@ export function OrdersTable({ data, loading, onRefresh }: OrdersTableProps) {
       enableExport={true}
       onBulkAction={(action, selectedData) => {
         if (action === "fulfill") {
-          selectedData.forEach(order => handleFulfill(order as Order))
+          selectedData.forEach((order) => handleFulfill(order as SimpleOrder));
         }
       }}
       bulkActions={bulkActions}
@@ -245,5 +251,5 @@ export function OrdersTable({ data, loading, onRefresh }: OrdersTableProps) {
       stickyHeader={true}
       pageSize={20}
     />
-  )
-} 
+  );
+}

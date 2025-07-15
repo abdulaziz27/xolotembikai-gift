@@ -1,21 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { createClient as createAdminClient } from '@supabase/supabase-js'
-import { Resend } from 'resend'
-import { z } from 'zod'
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
+import { Resend } from "resend";
+import { z } from "zod";
 
 const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
-  name: z.string()
-})
+  name: z.string(),
+});
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email, password, name } = signupSchema.parse(body)
+    const body = await request.json();
+    const { email, password, name } = signupSchema.parse(body);
 
     // Use admin client to create confirmed user
     const supabaseAdmin = createAdminClient(
@@ -24,49 +24,56 @@ export async function POST(request: NextRequest) {
       {
         auth: {
           autoRefreshToken: false,
-          persistSession: false
-        }
+          persistSession: false,
+        },
       }
-    )
+    );
 
     // Create user with admin client (auto-confirmed)
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true, // Auto-confirm email
-      user_metadata: {
-        full_name: name
-      }
-    })
+    const { data: authData, error: authError } =
+      await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true, // Auto-confirm email
+        user_metadata: {
+          full_name: name,
+        },
+      });
 
     if (authError) {
-      console.error('Auth signup error:', authError)
-      return NextResponse.json({ 
-        success: false, 
-        error: authError.message 
-      }, { status: 400 })
+      console.error("Auth signup error:", authError);
+      return NextResponse.json(
+        {
+          success: false,
+          error: authError.message,
+        },
+        { status: 400 }
+      );
     }
 
     if (!authData.user) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Failed to create user' 
-      }, { status: 400 })
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Failed to create user",
+        },
+        { status: 400 }
+      );
     }
 
     // Create profile in profiles table using admin client
-    const supabase = await createClient()
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert([{
+    const supabase = await createClient();
+    const { error: profileError } = await supabase.from("profiles").insert([
+      {
         id: authData.user.id,
         email: authData.user.email,
         full_name: name,
-        role: 'user'
-      }])
+        role: "user",
+      },
+    ]);
 
     if (profileError) {
-      console.error('Profile creation error:', profileError)
+      console.error("Profile creation error:", profileError);
       // Don't return error here as auth user is already created
     }
 
@@ -74,9 +81,9 @@ export async function POST(request: NextRequest) {
     try {
       if (process.env.RESEND_API_KEY) {
         await resend.emails.send({
-          from: 'Xolotembikai Gift <noreply@xolotembikai.com>',
+          from: "Xolotembikai Gift <noreply@gift.magercoding.com>",
           to: [email],
-          subject: 'Welcome to Xolotembikai Gift!',
+          subject: "Welcome to Xolotembikai Gift!",
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
               <h1 style="color: #7c3aed;">Welcome to Xolotembikai Gift, ${name}!</h1>
@@ -104,29 +111,31 @@ export async function POST(request: NextRequest) {
               
               <p>Best regards,<br>The Xolotembikai Gift Team</p>
             </div>
-          `
-        })
+          `,
+        });
       }
     } catch (emailError) {
-      console.error('Email sending error:', emailError)
+      console.error("Email sending error:", emailError);
       // Continue anyway
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Account created successfully!',
+    return NextResponse.json({
+      success: true,
+      message: "Account created successfully!",
       user: {
         id: authData.user.id,
         email: authData.user.email,
-        name: name
-      }
-    })
-
+        name: name,
+      },
+    });
   } catch (error: any) {
-    console.error('Signup error:', error)
-    return NextResponse.json({ 
-      success: false, 
-      error: error.message || 'Failed to create account' 
-    }, { status: 500 })
+    console.error("Signup error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error.message || "Failed to create account",
+      },
+      { status: 500 }
+    );
   }
-} 
+}

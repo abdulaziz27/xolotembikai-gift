@@ -1,10 +1,17 @@
--- Add role enum type
-CREATE TYPE user_role AS ENUM ('user', 'admin');
+-- Create a custom type for user roles
+CREATE TYPE user_role AS ENUM ('user', 'admin', 'vendor');
 
--- Add role column to profiles table
-ALTER TABLE profiles 
-ADD COLUMN role user_role DEFAULT 'user',
-ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+-- Add role and updated_at to profiles, and set up a trigger for updated_at
+ALTER TABLE profiles
+  ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+
+-- Note: The 'role' column is already added in the initial create_profiles script.
+-- This file previously tried to add it again, causing a conflict.
+-- The following lines have been removed to fix the migration failure:
+--
+-- ALTER TABLE profiles
+--   ADD COLUMN role user_role DEFAULT 'user',
+--   ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
 
 -- Create admin users table for additional admin-specific data
 CREATE TABLE admin_users (

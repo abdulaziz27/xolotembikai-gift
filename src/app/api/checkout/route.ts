@@ -1,79 +1,85 @@
-import { NextRequest, NextResponse } from 'next/server'
-import Stripe from 'stripe'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+import { createClient } from "@/lib/supabase/server";
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not set in environment variables')
+  throw new Error("STRIPE_SECRET_KEY is not set in environment variables");
 }
 
-// Initialize Stripe with the secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   typescript: true,
-})
+});
 
+// This API now ONLY creates a PaymentIntent with the amount.
+// It does not need customer details at this stage.
 export async function POST(request: NextRequest) {
   try {
-    const { experienceId, userId, email, name } = await request.json() // userId can be null
+    const body = await request.json();
+    const { experienceId, isGift, giftData } = body;
 
-    if (!experienceId || !email || !name) {
+    if (!experienceId) {
       return NextResponse.json(
-        { success: false, error: 'Missing required information: experience, email, and name.' },
+        { error: "Missing required information: experienceId." },
         { status: 400 }
-      )
+      );
     }
-    
-    const supabase = await createClient()
 
-    // Securely fetch the experience from the database to get the real price
+    const supabase = await createClient();
+
     const { data: experience, error: experienceError } = await supabase
-      .from('experiences')
-      .select('starting_price, currency, title')
-      .eq('id', experienceId)
-      .single()
+      .from("experiences")
+      .select("starting_price, currency")
+      .eq("id", experienceId)
+      .single();
 
     if (experienceError || !experience) {
-      console.error('Error fetching experience:', experienceError)
       return NextResponse.json(
-        { success: false, error: 'Experience not found or could not be fetched.' },
+        { error: "Experience not found." },
         { status: 404 }
-      )
+      );
     }
 
-    const { starting_price: amount, currency, title } = experience
+    const { starting_price: amount, currency } = experience;
 
     if (!amount || amount <= 0) {
       return NextResponse.json(
-        { success: false, error: 'Invalid price for the experience' },
+        { error: "Invalid price for the experience" },
         { status: 400 }
-      )
+      );
     }
 
-    // Create a PaymentIntent with the secure amount and currency from the database
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Stripe expects amount in cents
-      currency: currency || 'myr',
-      receipt_email: email,
-      metadata: {
-        experienceId,
-        userId: userId || 'guest', // Store 'guest' if userId is not provided
-        customerName: name,
-        customerEmail: email,
-      },
-      description: `Purchase of "${title}" by ${name || email}`,
-    })
+    // Prepare metadata for PaymentIntent
+    const metadata: any = {
+      experienceId,
+      isGift: isGift ? "true" : "false",
+    };
 
-    // Send the client_secret back to the client
+    // Add gift-specific metadata if this is a gift purchase
+    if (isGift && giftData) {
+      metadata.recipientName = giftData.recipientName || "";
+      metadata.recipientEmail = giftData.recipientEmail || "";
+      metadata.recipientPhone = giftData.recipientPhone || "";
+      metadata.personalMessage = giftData.personalMessage || "";
+      metadata.deliveryMethod = giftData.deliveryMethod || "";
+      metadata.deliveryDate = giftData.deliveryDate || "";
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100),
+      currency: currency || "myr",
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      metadata,
+    });
+
     return NextResponse.json({
-      success: true,
       clientSecret: paymentIntent.client_secret,
-    })
+      paymentIntentId: paymentIntent.id, // Also return the ID for the update step
+    });
   } catch (error) {
-    console.error('Stripe API Error:', error)
     const errorMessage =
-      error instanceof Error ? error.message : 'Internal server error'
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    )
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
-} 
+}

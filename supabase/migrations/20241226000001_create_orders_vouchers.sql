@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS public.orders (
     total_amount numeric(10, 2) NOT NULL,
     currency character varying(3) NOT NULL,
     status text NOT NULL DEFAULT 'pending', -- e.g., pending, paid, failed, refunded
-    stripe_payment_intent_id text UNIQUE NOT NULL,
+    stripe_payment_intent_id text UNIQUE, -- Can be null initially
+    session_id text UNIQUE, -- To link back to Stripe Checkout Session
+    is_gift boolean DEFAULT false,
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 

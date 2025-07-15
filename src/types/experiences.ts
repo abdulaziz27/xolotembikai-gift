@@ -1,6 +1,6 @@
-import type { Vendor } from './vendors'
+import type { Vendor } from "./vendors";
 
-export type { Vendor }
+export type { Vendor };
 
 export interface Experience extends Record<string, unknown> {
   id: string;
@@ -26,19 +26,19 @@ export interface Experience extends Record<string, unknown> {
   video_url?: string;
   duration?: string;
   min_age?: number;
-  difficulty_level?: 'Easy' | 'Moderate' | 'Challenging';
+  difficulty_level?: "Easy" | "Moderate" | "Challenging";
   redemption_instructions?: string;
   tags?: string[];
   inclusions?: string[];
   exclusions?: string[];
   requirements?: string[];
   cancellation_policy?: string;
-  vendor_type?: 'api' | 'manual';
+  vendor_type?: "api" | "manual";
   api_endpoint?: string;
   manual_codes?: string[];
   seo_title?: string;
   seo_description?: string;
-  status: 'active' | 'draft' | 'archived';
+  status: "active" | "draft" | "archived";
   published_at?: string;
   expires_at?: string;
   is_featured: boolean;
@@ -51,6 +51,22 @@ export interface Experience extends Record<string, unknown> {
   currency: string;
   is_variable_pricing?: boolean;
   price_options?: Record<string, number | string>;
+  // New fields added from database migration
+  discount_percentage?: number;
+  original_price?: number;
+  validity_period_months?: number;
+  contact_phone?: string;
+  contact_email?: string;
+  faqs?: Array<{ question: string; answer: string }>;
+  badges?: string[];
+  key_features?: string[];
+  available_gift_amounts?: number[];
+  redeemable_locations?: Array<{
+    name: string;
+    address: string;
+    phone?: string;
+  }>;
+  terms_conditions?: Array<{ title: string; content: string }>;
   vendor?: {
     id: string;
     name: string;
@@ -96,19 +112,19 @@ export interface ExperienceForm {
   max_participants?: number;
   min_participants?: number;
   min_age?: number;
-  difficulty_level?: 'Easy' | 'Moderate' | 'Challenging';
+  difficulty_level?: "Easy" | "Moderate" | "Challenging";
   redemption_instructions?: string;
   requirements: string[];
   inclusions: string[];
   exclusions: string[];
   cancellation_policy?: string;
-  vendor_type: 'api' | 'manual';
+  vendor_type: "api" | "manual";
   api_endpoint?: string;
   manual_codes: string[];
   seo_title?: string;
   seo_description?: string;
   tags: string[];
-  status: 'draft' | 'active' | 'archived';
+  status: "draft" | "active" | "archived";
   published_at?: string;
   expires_at?: string;
   is_featured: boolean;
@@ -190,41 +206,37 @@ export interface Occasion {
 }
 
 export const CATEGORIES = [
-  'Wellness',
-  'Food',
-  'Adventure',
-  'Technology',
-  'Arts',
-  'Fashion',
-  'Sports',
-  'Education',
-  'Entertainment',
-  'Travel'
+  "Wellness",
+  "Food",
+  "Adventure",
+  "Technology",
+  "Arts",
+  "Fashion",
+  "Sports",
+  "Education",
+  "Entertainment",
+  "Travel",
 ] as const;
 
 export const OCCASIONS = [
-  'Birthday',
-  'Anniversary',
-  'Graduation',
-  'Holiday',
-  'Thank You',
-  'Just Because',
-  'Wedding',
-  'Valentine\'s Day',
-  'Mother\'s Day',
-  'Father\'s Day'
+  "Birthday",
+  "Anniversary",
+  "Graduation",
+  "Holiday",
+  "Thank You",
+  "Just Because",
+  "Wedding",
+  "Valentine's Day",
+  "Mother's Day",
+  "Father's Day",
 ] as const;
 
 export const CURRENCIES = [
-  { code: 'USD', symbol: '$', name: 'US Dollar' },
-  { code: 'MYR', symbol: 'RM', name: 'Malaysian Ringgit' },
-  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
-  { code: 'GBP', symbol: '£', name: 'British Pound' },
-  { code: 'EUR', symbol: '€', name: 'Euro' }
+  { code: "USD", symbol: "$", name: "US Dollar" },
+  { code: "MYR", symbol: "RM", name: "Malaysian Ringgit" },
+  { code: "SGD", symbol: "S$", name: "Singapore Dollar" },
+  { code: "GBP", symbol: "£", name: "British Pound" },
+  { code: "EUR", symbol: "€", name: "Euro" },
 ] as const;
 
-export const DIFFICULTY_LEVELS = [
-  'Easy',
-  'Moderate',
-  'Challenging'
-] as const; 
+export const DIFFICULTY_LEVELS = ["Easy", "Moderate", "Challenging"] as const;
